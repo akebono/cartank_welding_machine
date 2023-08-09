@@ -31,7 +31,8 @@ float dL1=0,dL2=0,dA3=0;
 float x,y,z=0,c,xc,yc,zc=0,oldx,oldy,oldz;
 float velReceived;
 unsigned int status;
-unsigned int sernum=1;
+unsigned int sernum=0;
+unsigned int sernumsent=-1;
 unsigned int sernumback=0;
 
 double dx=0,dy=0,d3=0;
@@ -54,6 +55,9 @@ struct point{
 struct point trajectory[256];
 int trajectoryLength=0;
 int currentPoint=-1;
+char doTrajectory=0;
+
+
 float A1offset=600;
 float A2offset=600;
 
@@ -149,13 +153,13 @@ void draw(){
  if(dL1 || dL2 ||dA3)
   curpt++;
 
-
 /*
   if(Axis2>-30)
    Axis2=-30;
   if(Axis2<-145)
    Axis2=-145;
 */
+
   Axis3+=dA3*0.15;
   if(task){
    t0+=delta;
@@ -168,6 +172,19 @@ void draw(){
   }
 
   doCalc();
+
+  if(sernumback==sernumsent){
+   if(doTrajectory){
+    sendPacket(trajectory[currentPoint].type);
+    printf("current point:%i(%i)\n",currentPoint,trajectoryLength);
+    currentPoint++;
+    if(currentPoint==trajectoryLength){
+     EnableWindow(hButtonRunTrajectory,1);
+     currentPoint=-1;
+     doTrajectory=0;
+    }
+   }
+  }
 
   char lbuf[256];
   sprintf(lbuf,"X:%.2f mm",x);

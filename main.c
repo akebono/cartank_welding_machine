@@ -108,66 +108,45 @@ DWORD WINAPI thread(void*param){
     len=recvfrom(s,buf,1500,0,&rsa,&ralen);
     if(!len) break;
 
-    L1=*(float*)(buf+8);
-    L2=*(float*)(buf+12);
-    Axis3=*(float*)(buf+16);
-    velReceived=*(float*)(buf+20);
-    status=*(unsigned int*)(buf+24);
-    sernumback=*(unsigned int*)(buf+28);
-    sprintf(lbuf,"%08X\n",status);
+    L1=*(float*)(buf);
+    L2=*(float*)(buf+4);
+    Axis3=*(float*)(buf+8);
+    velReceived=*(float*)(buf+12);
+    status=*(unsigned int*)(buf+16);
+    sernumback=*(unsigned int*)(buf+20);
+
+    sprintf(lbuf,"%08X (%u,%u)\n",status,sernumback,sernum);
+
     SetWindowText(hStatus,lbuf);
+
+    if(sernumback==sernumsent)
+     sernum++;
     doCalc();
+
+/*for drawing graphic*/
     traj[curpt][0]=x;
     traj[curpt][1]=y;
     curpt++;
     if(curpt==POINTS)
      curpt=0;
+
   }while(len>0);
   printf("ops\n");
   return 0;
 }
 
-DWORD WINAPI threadSend(void*param){
+void sendPacket(unsigned int type){
  char lbuf[1501];
- while(1){
-/*
-  if(!(status&192)||(status&3))
-   continue;
-*/
-  if(currentPoint<0)
-   continue;
-  printf("[%i] %i\n",currentPoint,trajectory[currentPoint].type);
-  memset(lbuf,0,32);
-  if(trajectory[currentPoint].type==0)
-   lbuf[0]=0;
-  else if(trajectory[currentPoint].type==1)
-   lbuf[0]=1;
-  else
-   continue;
-  if(sernumback==sernum)
-   sernum++;
-  else
-   continue;
-  memcpy(lbuf+4,&trajectory[currentPoint].x,4);
-  memcpy(lbuf+8,&trajectory[currentPoint].y,4);
-  memcpy(lbuf+12,&trajectory[currentPoint].c,4);
-  memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
-  memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
-  memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
-  memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
-  memcpy(lbuf+32,&sernum,4);
-
-  if(sendto(s,lbuf,36,0,&rsa,16)==-1)
-   printf("send failed\n");
-
-  printf("current point:%i(%i)\n",currentPoint,trajectoryLength);
-
-  currentPoint++;
-  if(currentPoint==trajectoryLength){
-   EnableWindow(hButtonRunTrajectory,1);
-   currentPoint=-1;
-  }
-}
+ memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+ memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+ memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+ memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+ memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+ memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+ memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+ memcpy(lbuf+32,&sernumsent,4);
+ if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+  printf("send failed\n");
 }
 
 //int APIENTRY wWinMain(HINSTANCE h1,HINSTANCE h2,LPWSTR fr,int bh){
@@ -337,10 +316,6 @@ printf("Codepage:%u\n",GetACP());
 */
 
   if(!CreateThread(0,0,thread,0,0,0)){
-    printf("create thread failed\n");
-    return -1;
-  }
-  if(!CreateThread(0,0,threadSend,0,0,0)){
     printf("create thread failed\n");
     return -1;
   }

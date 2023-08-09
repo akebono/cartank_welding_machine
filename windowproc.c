@@ -133,6 +133,7 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
        memcpy(lbuf+8,&ly,4);
        memcpy(lbuf+12,&lc,4);
        memcpy(lbuf+16,&lvel,4);
+       memcpy(lbuf+20,&sernum,4);
        lbuf[0]=0;
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
        if(sendto(s,lbuf,32,0,&rsa,16)==-1)
@@ -214,8 +215,8 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        memcpy(lbuf+20,&xa,4);
        memcpy(lbuf+24,&ya,4);
        memcpy(lbuf+28,&ca,4);
-
-       if(sendto(s,lbuf,32,0,&rsa,16)==-1)
+       memcpy(lbuf+32,&sernum,4);
+       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 

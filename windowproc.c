@@ -371,40 +371,90 @@ printf("%i: %.3f %.3f %.3f\n",i,points[i*3],points[i*3+1],points[i*3+2]);
       if(lParam==(LPARAM)hButtonRunTrajectory){
         if(currentPoint==-1){
          currentPoint=0;
+         doTrajectory=1;
          EnableWindow(hButtonRunTrajectory,0);
+         EnableWindow(hButtonPauseTrajectory,1);
+         EnableWindow(hButtonStopTrajectory,1);
         }
       }
+
+      if(lParam==(LPARAM)hButtonPauseTrajectory){
+       doTrajectory=0;
+       EnableWindow(hButtonRunTrajectory,1);
+      }
+      if(lParam==(LPARAM)hButtonStopTrajectory){
+       doTrajectory=0;
+       currentPoint=-1;
+       EnableWindow(hButtonPauseTrajectory,0);
+       EnableWindow(hButtonStopTrajectory,0);
+      }
+
       if(lParam==(LPARAM)hXPlusButton){
        GetWindowText(hIncValue,lbuf,255);
-       x+=atof(lbuf);
-//       doInverse();
-       char lbuf[32];
-/*
-       memset(lbuf,0,32);
-       memcpy(lbuf+4,&x,4);
+       float newx=x+atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
        memcpy(lbuf+12,&c,4);
-       memcpy(lbuf+16,&lvel,4);
-       lbuf[0]=0;
-       printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
-       if(sendto(s,lbuf,32,0,&rsa,16)==-1)
-         printf("send failed\n");
-*/
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
       }
       if(lParam==(LPARAM)hXMinusButton){
        GetWindowText(hIncValue,lbuf,255);
-       x-=atof(lbuf);
-       doInverse();
+       float newx=x-atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&newx,4);
+       memcpy(lbuf+8,&y,4);
+       memcpy(lbuf+12,&c,4);
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
       }
       if(lParam==(LPARAM)hYPlusButton){
        GetWindowText(hIncValue,lbuf,255);
-       y+=atof(lbuf);
-       doInverse();
+       float newy=y+atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&x,4);
+       memcpy(lbuf+8,&newy,4);
+       memcpy(lbuf+12,&c,4);
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
       }
       if(lParam==(LPARAM)hYMinusButton){
        GetWindowText(hIncValue,lbuf,255);
-       y-=atof(lbuf);
-       doInverse();
+       float newy=y-atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&x,4);
+       memcpy(lbuf+8,&newy,4);
+       memcpy(lbuf+12,&c,4);
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
       }
 //SetFocus(hTest);
     break;

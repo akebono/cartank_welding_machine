@@ -42,7 +42,7 @@ float trajc[POINTS][3];
 int curpt=0;
 
 struct point{
- unsigned char type;
+ unsigned int type; //not char, because controller's BOOL is 4 bytes wide
  float x;
  float y;
  float c;
@@ -175,7 +175,19 @@ void draw(){
 
   if(sernumback==sernumsent){
    if(doTrajectory){
-    sendPacket(trajectory[currentPoint].type);
+    char lbuf[36];
+    memset(lbuf,0,36);
+    memcpy(lbuf,&trajectory[currentPoint].type,4);
+    memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+    memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+    memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+    memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+    memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+    memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+    memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+    sernumsent=sernum;
+    memcpy(lbuf+32,&sernumsent,4);
+    sendPacket(trajectory[currentPoint].type,lbuf);
     printf("current point:%i(%i)\n",currentPoint,trajectoryLength);
     currentPoint++;
     if(currentPoint==trajectoryLength){
@@ -245,13 +257,6 @@ trajc[curpt][1]=yc;
   }
   glEnd();
 
-  glColor3f(1,1,0);
-  glBegin(GL_LINES);
-  for(int i=1;i<pnum;i++){
-   glVertex3f(trajectory[i-1].x,trajectory[i-1].y,1300);
-   glVertex3f(trajectory[i].x,trajectory[i].y,1300);
-  }
-  glEnd();
 
   glEnable(GL_LIGHTING);
 
@@ -434,6 +439,7 @@ trajc[curpt][1]=yc;
   glTranslatef(0,-A1offset,600);
   glRotatef(A1motor,0,0,1);
   glBegin(GL_TRIANGLES);
+
   mat[0]=0.35;
   mat[1]=1;
   mat[2]=0.1;
@@ -596,9 +602,18 @@ glDisable(GL_LIGHTING);
 
 glEnable(GL_LIGHTING);
   j=4;
-  mat[0]=0.5;
-  mat[1]=0.5;
-  mat[2]=1;
+  if(status&1)
+   mat[0]=1;
+  else
+   mat[0]=0.2;
+  if(status&2)
+   mat[1]=1;
+  else
+   mat[1]=0.2;
+  if(status&4)
+   mat[2]=1;
+  else
+   mat[2]=0.2;
   mat[3]=1;
   glMaterialfv(GL_FRONT,GL_DIFFUSE,mat);
   glBegin(GL_TRIANGLES);

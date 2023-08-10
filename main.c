@@ -3,11 +3,11 @@
 #include <commctrl.h>
 #include <gl/gl.h>
 
-int w=800,h=600;
+int w=600,h=500;
 WNDPROC origTestProc,editProc,openglProc;
 WNDPROC origExecMove;
 
-HWND hPointVel,hPointVelBG,hPointVelLabel;
+HWND hPointVel,hPointVelBG;
 HWND hHelpLabel;
 
 //HWND hAngleLabel,hAngleEdit,hAngleBkgnd;
@@ -20,6 +20,8 @@ HWND hButtonOpen;
 HWND hButtonStartServer,hStatus;
 HWND hButtonErase;
 HWND hButtonRunTrajectory;
+HWND hButtonPauseTrajectory;
+HWND hButtonStopTrajectory;
 
 //Конструкционные параметры (отступы креплений швп, и их рычаги)
 HWND hA1OffsetLabel,hA2OffsetLabel;
@@ -41,10 +43,14 @@ HWND hResetErrorButton;
 
 HWND hXPlusButton,hXMinusButton,hYPlusButton,hYMinusButton;
 HWND hIncLabel,hIncValue;
+HWND hIncVelLabel,hIncVelValue;
 
 SOCKET s;
 struct sockaddr rsa;
 int ralen=16;
+
+void sendPacket(unsigned int,unsigned char*);
+
 #include "draw.c"
 PIXELFORMATDESCRIPTOR pfd = { 0x28,   // size of this pfd
 	1,                     // version number
@@ -119,8 +125,15 @@ DWORD WINAPI thread(void*param){
 
     SetWindowText(hStatus,lbuf);
 
-    if(sernumback==sernumsent)
+    if(sernumback==sernumsent){
+//enable command buttons
+     EnableWindow(hButtonRunTrajectory,1);
+     EnableWindow(hXPlusButton,1);
+     EnableWindow(hXMinusButton,1);
+     EnableWindow(hYPlusButton,1);
+     EnableWindow(hYMinusButton,1);
      sernum++;
+    }
     doCalc();
 
 /*for drawing graphic*/
@@ -135,16 +148,7 @@ DWORD WINAPI thread(void*param){
   return 0;
 }
 
-void sendPacket(unsigned int type){
- char lbuf[1501];
- memcpy(lbuf+4,&trajectory[currentPoint].x,4);
- memcpy(lbuf+8,&trajectory[currentPoint].y,4);
- memcpy(lbuf+12,&trajectory[currentPoint].c,4);
- memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
- memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
- memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
- memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
- memcpy(lbuf+32,&sernumsent,4);
+void sendPacket(unsigned int type,unsigned char *lbuf){
  if(sendto(s,lbuf,36,0,&rsa,16)==-1)
   printf("send failed\n");
 }
@@ -184,7 +188,7 @@ printf("Codepage:%u\n",GetACP());
     return 0;
   }
 
-  hwnd = CreateWindow("STATIC", "tank welding",WS_VISIBLE|SS_GRAYRECT, 0, 0, 1500, 900, 0, 0,0, 0);
+  hwnd = CreateWindow("STATIC", "tank welding",WS_VISIBLE|SS_GRAYRECT, 0, 0, 1020, h+250, 0, 0,0, 0);
   if(!hwnd){ 
     sprintf(buf,"error:%08X\n",GetLastError());
     MessageBox(0,buf,"nope",0);
@@ -192,12 +196,11 @@ printf("Codepage:%u\n",GetACP());
   }
   SetWindowLongPtr(hwnd,GWLP_WNDPROC,(LONG_PTR)&WinProc2);
 
-  opengl=CreateWindowA("HELLO","",WS_CHILD|WS_VISIBLE,10,10,w,h,hwnd,0,0,0);
+  opengl=CreateWindowA("HELLO","",WS_CHILD|WS_VISIBLE,0,0,w,h,hwnd,0,0,0);
   openglProc=(WNDPROC)SetWindowLongPtr(opengl,GWLP_WNDPROC,(LONG_PTR)&WinProcOpenGL);
-  hButtonOpen = CreateWindowA("BUTTON","Open points' file",WS_CHILD|WS_VISIBLE,820,530,140,26,hwnd,0,0,0);
-  hButtonRunTrajectory=CreateWindowA("BUTTON","Run trajectory",WS_CHILD|WS_VISIBLE,820,560,140,26,hwnd,0,0,0);
 
-  hStatus = CreateWindowA("STATIC","Waiting for net",WS_CHILD|WS_VISIBLE,1000,530,220,26,hwnd,0,0,0);
+
+  hStatus = CreateWindowA("STATIC","Waiting for net",WS_CHILD|WS_VISIBLE,800,h,220,20,hwnd,0,0,0);
  INITCOMMONCONTROLSEX icce;
  icce.dwSize=sizeof(icce);
  icce.dwICC=ICC_LISTVIEW_CLASSES;
@@ -205,15 +208,14 @@ printf("Codepage:%u\n",GetACP());
   printf("InitCommonControlsEx failed\n");
   return GetLastError();
  }
- HWND hLabel1=CreateWindow("STATIC","Trajectory",WS_CHILD|WS_VISIBLE,820,5,480,30,hwnd,0,0,0);
   
 // SetFocus(hTest);
- hPointVelLabel=CreateWindow("STATIC","G-code:",WS_CHILD|WS_VISIBLE,1120,15,70,26,hwnd,0,0,0);
 
 // hPointVelBG=CreateWindow("STATIC",0,WS_CHILD|WS_VISIBLE,1188,13, 104,504,hwnd,0,0,0);
- hPointVel=CreateWindow("EDIT",0,WS_CHILD|WS_VISIBLE|ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL/*|ES_NUMBER*/,1190,15, 100,500,hwnd,0,0,0);
+
+ hPointVel=CreateWindow("EDIT",0,WS_CHILD|WS_VISIBLE|ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL/*|ES_NUMBER*/,1120,40, 100,500,hwnd,0,0,0);
 // editProc=(WNDPROC)SetWindowLongPtr(hPointVel,GWLP_WNDPROC,(LONG_PTR)&WinProcEdit);
- hHelpLabel=CreateWindow("STATIC","Control:\r\nAxis 1 +/- : Q/A\r\nAxis 2 +/- : W/S\r\nAxis 3 +/- : E/D\r\nNumpad \"+\" - zoom in\r\nNumpad \"-\" - zoom out\r\nRight mouse button - rotate\r\nNumpad \"7\" - Top view\r\nNumpad \".\" - reset view",WS_CHILD|WS_VISIBLE,600,650,220,130,hwnd,0,0,0);
+ hHelpLabel=CreateWindow("STATIC","Control:\r\nAxis 1 +/- : Q/A\r\nAxis 2 +/- : W/S\r\nAxis 3 +/- : E/D\r\nNumpad \"+\" - zoom in\r\nNumpad \"-\" - zoom out\r\nRight mouse button - rotate\r\nNumpad \"7\" - Top view\r\nNumpad \".\" - reset view",WS_CHILD|WS_VISIBLE,550,h+60,220,130,hwnd,0,0,0);
 
 // SendMessage(hPointVel,WM_SETTEXT,0,(LPARAM)lll);
 /*
@@ -227,58 +229,61 @@ printf("Codepage:%u\n",GetACP());
  hA1LeverInput=CreateWindow("EDIT","400",WS_CHILD|WS_VISIBLE|WS_BORDER,552,715,50,25,hwnd,0,0,0);
  hA2LeverInput=CreateWindow("EDIT","400",WS_CHILD|WS_VISIBLE|WS_BORDER,552,740,50,25,hwnd,0,0,0);
 */
- hButtonErase=CreateWindow("BUTTON","Erase",WS_CHILD|WS_VISIBLE,670,625,120,25,hwnd,0,0,0);
 
- hLinetoButton=CreateWindow("BUTTON","Move to:",WS_CHILD|WS_VISIBLE,340,620,90,25,hwnd,0,0,0);
- hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,430,620,90,25,hwnd,0,0,0);
 
- hXLinLabel=CreateWindow("STATIC","X:",WS_CHILD|WS_VISIBLE,340,645,35,25,hwnd,0,0,0);
- hYLinLabel=CreateWindow("STATIC","Y:",WS_CHILD|WS_VISIBLE,340,670,35,25,hwnd,0,0,0);
- hCLinLabel=CreateWindow("STATIC","C:",WS_CHILD|WS_VISIBLE,340,695,35,25,hwnd,0,0,0);
- hLinVelLabel=CreateWindow("STATIC","Vel:",WS_CHILD|WS_VISIBLE,340,720,35,25,hwnd,0,0,0);
+ hButtonErase=CreateWindow("BUTTON","Erase",WS_CHILD|WS_VISIBLE,550,h,50,25,hwnd,0,0,0);
+
+ hLinetoButton=CreateWindow("BUTTON","Move to:",WS_CHILD|WS_VISIBLE,340,h,90,25,hwnd,0,0,0);
+ hXLinLabel=CreateWindow("STATIC","X:",WS_CHILD|WS_VISIBLE,340,h+25,35,25,hwnd,0,0,0);
+ hYLinLabel=CreateWindow("STATIC","Y:",WS_CHILD|WS_VISIBLE,340,h+50,35,25,hwnd,0,0,0);
+ hCLinLabel=CreateWindow("STATIC","C:",WS_CHILD|WS_VISIBLE,340,h+75,35,25,hwnd,0,0,0);
+ hLinVelLabel=CreateWindow("STATIC","Vel:",WS_CHILD|WS_VISIBLE,340,h+100,35,25,hwnd,0,0,0);
+ hXLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+25,55,25,hwnd,0,0,0);
+ hYLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+50,55,25,hwnd,0,0,0);
+ hCLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+75,55,25,hwnd,0,0,0);
+ hLinVel=CreateWindow("EDIT","100",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+100,55,25,hwnd,0,0,0);
 
  
- hXCircEndLabel=CreateWindow("STATIC","end X:",WS_CHILD|WS_VISIBLE,430,645,45,25,hwnd,0,0,0);
- hYCircEndLabel=CreateWindow("STATIC","end Y:",WS_CHILD|WS_VISIBLE,430,670,45,25,hwnd,0,0,0);
- hCCircEndLabel=CreateWindow("STATIC","end C:",WS_CHILD|WS_VISIBLE,430,695,45,25,hwnd,0,0,0);
- hXCircAuxLabel=CreateWindow("STATIC","aux X:",WS_CHILD|WS_VISIBLE,430,720,45,25,hwnd,0,0,0);
- hYCircAuxLabel=CreateWindow("STATIC","aux Y:",WS_CHILD|WS_VISIBLE,430,745,45,25,hwnd,0,0,0);
- hCCircAuxLabel=CreateWindow("STATIC","aux C:",WS_CHILD|WS_VISIBLE,430,770,45,25,hwnd,0,0,0);
- hCircVelLabel=CreateWindow("STATIC","Vel:",WS_CHILD|WS_VISIBLE,430,795,45,25,hwnd,0,0,0);
-
- hXLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,645,50,25,hwnd,0,0,0);
- hYLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,670,50,25,hwnd,0,0,0);
- hCLin=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,695,50,25,hwnd,0,0,0);
- hLinVel=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,375,720,50,25,hwnd,0,0,0);
-
- hXCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,645,50,25,hwnd,0,0,0);
- hYCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,670,50,25,hwnd,0,0,0);
- hCCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,695,50,25,hwnd,0,0,0);
- hXCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,720,50,25,hwnd,0,0,0);
- hYCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,745,50,25,hwnd,0,0,0);
- hCCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,770,50,25,hwnd,0,0,0);
- hCircVel=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,795,50,25,hwnd,0,0,0);
-
- hPosLabel=CreateWindow("STATIC","Actual position",WS_CHILD|WS_VISIBLE,10,620,100,25,hwnd,0,0,0);
- hXactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,15,645,95,25,hwnd,0,0,0);
- hYactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,15,670,95,25,hwnd,0,0,0);
- hZactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,15,695,95,25,hwnd,0,0,0);
- hVelactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,15,720,95,25,hwnd,0,0,0);
-
- hAxesLabel=CreateWindow("STATIC","Axis (deg)/ Ball Screw (mm)",WS_CHILD|WS_VISIBLE,120,620,200,25,hwnd,0,0,0);
- hA1=CreateWindow("STATIC","0 / 0",WS_CHILD|WS_VISIBLE,120,645,140,25,hwnd,0,0,0);
- hA2=CreateWindow("STATIC","0 / 0",WS_CHILD|WS_VISIBLE,120,670,140,25,hwnd,0,0,0);
- hA3=CreateWindow("STATIC","0",WS_CHILD|WS_VISIBLE,120,695,140,25,hwnd,0,0,0);
-
- hIncLabel=CreateWindow("STATIC","Increment Step(mm):",WS_CHILD|WS_VISIBLE,120,720,140,25,hwnd,0,0,0);
- hIncValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,720,50,25,hwnd,0,0,0);
- hXPlusButton=CreateWindow("BUTTON","X+",WS_CHILD|WS_VISIBLE,120,745,40,25,hwnd,0,0,0);
- hXMinusButton=CreateWindow("BUTTON","X-",WS_CHILD|WS_VISIBLE,160,745,40,25,hwnd,0,0,0);
- hYPlusButton=CreateWindow("BUTTON","Y+",WS_CHILD|WS_VISIBLE,200,745,40,25,hwnd,0,0,0);
- hYMinusButton=CreateWindow("BUTTON","Y-",WS_CHILD|WS_VISIBLE,240,745,40,25,hwnd,0,0,0);
+ hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,430,h,95,25,hwnd,0,0,0);
+ hXCircEndLabel=CreateWindow("STATIC","end X:",WS_CHILD|WS_VISIBLE,430,h+25,45,25,hwnd,0,0,0);
+ hYCircEndLabel=CreateWindow("STATIC","end Y:",WS_CHILD|WS_VISIBLE,430,h+50,45,25,hwnd,0,0,0);
+ hCCircEndLabel=CreateWindow("STATIC","end C:",WS_CHILD|WS_VISIBLE,430,h+75,45,25,hwnd,0,0,0);
+ hXCircAuxLabel=CreateWindow("STATIC","aux X:",WS_CHILD|WS_VISIBLE,430,h+100,45,25,hwnd,0,0,0);
+ hYCircAuxLabel=CreateWindow("STATIC","aux Y:",WS_CHILD|WS_VISIBLE,430,h+125,45,25,hwnd,0,0,0);
+ hCCircAuxLabel=CreateWindow("STATIC","aux C:",WS_CHILD|WS_VISIBLE,430,h+150,45,25,hwnd,0,0,0);
+ hCircVelLabel=CreateWindow("STATIC","Vel:",WS_CHILD|WS_VISIBLE,430,h+175,45,25,hwnd,0,0,0);
 
 
- hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,620,90,25,hwnd,0,0,0);
+ hXCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+25,50,25,hwnd,0,0,0);
+ hYCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+50,50,25,hwnd,0,0,0);
+ hCCircEnd=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+75,50,25,hwnd,0,0,0);
+ hXCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+100,50,25,hwnd,0,0,0);
+ hYCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+125,50,25,hwnd,0,0,0);
+ hCCircAux=CreateWindow("EDIT","0",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+150,50,25,hwnd,0,0,0);
+ hCircVel=CreateWindow("EDIT","100",WS_CHILD|WS_VISIBLE|WS_BORDER,475,h+175,50,25,hwnd,0,0,0);
+
+ hPosLabel=CreateWindow("STATIC","Actual position",WS_CHILD|WS_VISIBLE,0,h,100,25,hwnd,0,0,0);
+ hXactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,5,h+25,95,25,hwnd,0,0,0);
+ hYactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,5,h+50,95,25,hwnd,0,0,0);
+ hZactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,5,h+75,95,25,hwnd,0,0,0);
+ hVelactual=CreateWindow("STATIC","(0)",WS_CHILD|WS_VISIBLE,5,h+100,95,25,hwnd,0,0,0);
+
+ hAxesLabel=CreateWindow("STATIC","Axis (deg)/ Ball Screw (mm)",WS_CHILD|WS_VISIBLE,120,h,200,25,hwnd,0,0,0);
+ hA1=CreateWindow("STATIC","0 / 0",WS_CHILD|WS_VISIBLE,120,h+25,200,25,hwnd,0,0,0);
+ hA2=CreateWindow("STATIC","0 / 0",WS_CHILD|WS_VISIBLE,120,h+50,200,25,hwnd,0,0,0);
+ hA3=CreateWindow("STATIC","0",WS_CHILD|WS_VISIBLE,120,h+75,200,25,hwnd,0,0,0);
+
+ hIncLabel=CreateWindow("STATIC","Increment Step(mm):",WS_CHILD|WS_VISIBLE,120,h+120,140,25,hwnd,0,0,0);
+ hIncValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+120,50,25,hwnd,0,0,0);
+ hIncVelLabel=CreateWindow("STATIC","Velocity(mm):",WS_CHILD|WS_VISIBLE,120,h+145,140,25,hwnd,0,0,0);
+ hIncVelValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+145,50,25,hwnd,0,0,0);
+ hXPlusButton=CreateWindow("BUTTON","X+",WS_CHILD|WS_VISIBLE,120,h+170,40,25,hwnd,0,0,0);
+ hXMinusButton=CreateWindow("BUTTON","X-",WS_CHILD|WS_VISIBLE,160,h+170,40,25,hwnd,0,0,0);
+ hYPlusButton=CreateWindow("BUTTON","Y+",WS_CHILD|WS_VISIBLE,200,h+170,40,25,hwnd,0,0,0);
+ hYMinusButton=CreateWindow("BUTTON","Y-",WS_CHILD|WS_VISIBLE,240,h+170,40,25,hwnd,0,0,0);
+
+
+ hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,h+35,90,25,hwnd,0,0,0);
 
  char lbuf[256];
  sprintf(lbuf,"%.1f",A1offset);
@@ -290,7 +295,15 @@ printf("Codepage:%u\n",GetACP());
  sprintf(lbuf,"%.1f",A2lever);
  SetWindowText(hA2LeverInput,lbuf);
 
- hTest= CreateWindowA(WC_LISTVIEW,"",WS_CHILD|WS_VISIBLE|LVS_REPORT,810,30,320,500,hwnd,0,0,0);
+
+ hButtonOpen = CreateWindowA("BUTTON","Open points' file",WS_CHILD|WS_VISIBLE,650,h,140,25,hwnd,0,0,0);
+ hButtonRunTrajectory=CreateWindowA("BUTTON","Run",WS_CHILD|WS_VISIBLE,650,h+25,45,25,hwnd,0,0,0);
+ hButtonPauseTrajectory=CreateWindowA("BUTTON","Pause",WS_CHILD|WS_VISIBLE,695,h+25,50,25,hwnd,0,0,0);
+ hButtonStopTrajectory=CreateWindowA("BUTTON","Stop",WS_CHILD|WS_VISIBLE,745,h+25,45,25,hwnd,0,0,0);
+ EnableWindow(hButtonPauseTrajectory,0);
+ EnableWindow(hButtonStopTrajectory,0);
+ HWND hLabel1=CreateWindow("STATIC","Trajectory",WS_CHILD|WS_VISIBLE,w+10,0,320,30,hwnd,0,0,0);
+ hTest= CreateWindowA(WC_LISTVIEW,"",WS_CHILD|WS_VISIBLE|LVS_REPORT,w+10,30,320,h-30,hwnd,0,0,0);
  origTestProc=(WNDPROC)SetWindowLongPtr(hTest,GWLP_WNDPROC,(LONG_PTR)&WinProcLV);
 
  LVCOLUMN col;

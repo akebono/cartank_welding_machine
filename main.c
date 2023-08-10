@@ -41,7 +41,7 @@ HWND hAxesLabel;
 
 HWND hResetErrorButton;
 
-HWND hXPlusButton,hXMinusButton,hYPlusButton,hYMinusButton;
+HWND hXPlusButton,hXMinusButton,hYPlusButton,hYMinusButton,hCPlusButton,hCMinusButton;
 HWND hIncLabel,hIncValue;
 HWND hIncVelLabel,hIncVelValue;
 
@@ -113,26 +113,26 @@ DWORD WINAPI thread(void*param){
     memset(buf,0,1501);
     len=recvfrom(s,buf,1500,0,&rsa,&ralen);
     if(!len) break;
-
+printf("packet length is %i\n",len);
     L1=*(float*)(buf);
     L2=*(float*)(buf+4);
     Axis3=*(float*)(buf+8);
     velReceived=*(float*)(buf+12);
-    status=*(unsigned int*)(buf+16);
-    sernumback=*(unsigned int*)(buf+20);
+    status=*(unsigned short*)(buf+16);
+    sernumback=*(unsigned short*)(buf+18);
 
-    sprintf(lbuf,"%08X (%u,%u)\n",status,sernumback,sernum);
+    sprintf(lbuf,"%04X (%u,%u)\n",status,sernumback,sernum);
 
     SetWindowText(hStatus,lbuf);
 
     if(sernumback==sernumsent){
 //enable command buttons
-     EnableWindow(hButtonRunTrajectory,1);
+//     EnableWindow(hButtonRunTrajectory,1);
      EnableWindow(hXPlusButton,1);
      EnableWindow(hXMinusButton,1);
      EnableWindow(hYPlusButton,1);
      EnableWindow(hYMinusButton,1);
-     sernum++;
+     sernum=sernumback+1;
     }
     doCalc();
 
@@ -275,12 +275,14 @@ printf("Codepage:%u\n",GetACP());
 
  hIncLabel=CreateWindow("STATIC","Increment Step(mm):",WS_CHILD|WS_VISIBLE,120,h+120,140,25,hwnd,0,0,0);
  hIncValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+120,50,25,hwnd,0,0,0);
- hIncVelLabel=CreateWindow("STATIC","Velocity(mm):",WS_CHILD|WS_VISIBLE,120,h+145,140,25,hwnd,0,0,0);
+ hIncVelLabel=CreateWindow("STATIC","Velocity(mm/s):",WS_CHILD|WS_VISIBLE,120,h+145,140,25,hwnd,0,0,0);
  hIncVelValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+145,50,25,hwnd,0,0,0);
  hXPlusButton=CreateWindow("BUTTON","X+",WS_CHILD|WS_VISIBLE,120,h+170,40,25,hwnd,0,0,0);
  hXMinusButton=CreateWindow("BUTTON","X-",WS_CHILD|WS_VISIBLE,160,h+170,40,25,hwnd,0,0,0);
  hYPlusButton=CreateWindow("BUTTON","Y+",WS_CHILD|WS_VISIBLE,200,h+170,40,25,hwnd,0,0,0);
  hYMinusButton=CreateWindow("BUTTON","Y-",WS_CHILD|WS_VISIBLE,240,h+170,40,25,hwnd,0,0,0);
+ hCPlusButton=CreateWindow("BUTTON","C+",WS_CHILD|WS_VISIBLE,280,h+170,40,25,hwnd,0,0,0);
+ hCMinusButton=CreateWindow("BUTTON","C-",WS_CHILD|WS_VISIBLE,320,h+170,40,25,hwnd,0,0,0);
 
 
  hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,h+35,90,25,hwnd,0,0,0);

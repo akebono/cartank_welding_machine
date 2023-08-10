@@ -30,10 +30,10 @@ float dL1=0,dL2=0,dA3=0;
 
 float x,y,z=0,c,xc,yc,zc=0,oldx,oldy,oldz;
 float velReceived;
-unsigned int status;
-unsigned int sernum=0;
-unsigned int sernumsent=-1;
-unsigned int sernumback=0;
+unsigned short status;
+unsigned short sernum=0;
+unsigned short sernumsent=-1;
+unsigned short sernumback=0;
 
 double dx=0,dy=0,d3=0;
 float xe,ye,ce,a3e,a3a;
@@ -173,7 +173,7 @@ void draw(){
 
   doCalc();
 
-  if(sernumback==sernumsent){
+  if((sernumback==sernumsent) && (!(status&45))){
    if(doTrajectory){
     char lbuf[36];
     memset(lbuf,0,36);
@@ -186,7 +186,7 @@ void draw(){
     memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
     sernumsent=sernum;
-    memcpy(lbuf+32,&sernumsent,4);
+    memcpy(lbuf+32,&sernumsent,2);
     sendPacket(trajectory[currentPoint].type,lbuf);
     printf("current point:%i(%i)\n",currentPoint,trajectoryLength);
     currentPoint++;
@@ -602,15 +602,15 @@ glDisable(GL_LIGHTING);
 
 glEnable(GL_LIGHTING);
   j=4;
-  if(status&1)
+  if(status&9)
    mat[0]=1;
   else
    mat[0]=0.2;
-  if(status&2)
+  if(status&18)
    mat[1]=1;
   else
    mat[1]=0.2;
-  if(status&4)
+  if(status&36)
    mat[2]=1;
   else
    mat[2]=0.2;
@@ -624,6 +624,11 @@ glEnable(GL_LIGHTING);
     glVertex3f(*(float*)(blobs[j]+40+i*50),*(float*)(blobs[j]+44+i*50),*(float*)(blobs[j]+48+i*50));
   }
   glEnd();
+  mat[0]=1;
+  mat[1]=1;
+  mat[2]=1;
+  mat[3]=1;
+  glMaterialfv(GL_FRONT,GL_DIFFUSE,mat);
 
 
   glPopMatrix();

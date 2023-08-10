@@ -277,11 +277,9 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
             end=strchr(end+1,';');
 
 float derVel=atof(end+1);
-printf("vel=%.3f\n",derVel);
 end=strchr(end+1,';');
 trajectory[pnum].vel=derVel;
 char derType=end[1];
-printf("%c\n",derType);
 end=strchr(end+1,';');
 if(derType=='L')
  trajectory[pnum].type=0;
@@ -290,33 +288,27 @@ else if(derType=='C')
 else
  printf("derType=%c\n",derType);
 float derX=atof(end+1);
-printf("%.3f\n",derX);
 end=strchr(end+1,';');
 trajectory[pnum].x=derX;
 
 float derY=atof(end+1);
-printf("%.3f\n",derY);
 end=strchr(end+1,';');
 trajectory[pnum].y=derY;
 
 float derC=atof(end+1);
-printf("%.3f\n",derC);
 end=strchr(end+1,';');
 trajectory[pnum].c=derC;
 
 if(derType=='C'){
  float derXaux=atof(end+1);
- printf("%.3f\n",derXaux);
  end=strchr(end+1,';');
  trajectory[pnum].xa=derXaux;
 
  float derYaux=atof(end+1);
- printf("%.3f\n",derYaux);
  end=strchr(end+1,';');
  trajectory[pnum].ya=derYaux;
 
  float derCaux=atof(end+1);
- printf("%.3f\n",derCaux);
  end=strchr(end+1,';');
  trajectory[pnum].ca=derCaux;
 }           
@@ -326,14 +318,14 @@ if(derType=='C'){
               break;
             pnum++;
           }while(offset<fbuf+st.st_size);
-trajectoryLength=pnum;
-printf("pnum=%i\n",pnum);
+          trajectoryLength=pnum;
           SendMessage(hTest,WM_PAINT,0,0);
           offset=fbuf;
-//printf("%i\n",pnum);
-for(int i=0;i<st.st_size;i++)
- if(*(fbuf+i)==0)
-    *(fbuf+i)=';';
+
+          for(int i=0;i<st.st_size;i++)
+           if(*(fbuf+i)==0)
+            *(fbuf+i)=';';
+
           int idx=0;
           do{
             lineStart=offset;
@@ -346,7 +338,6 @@ for(int i=0;i<st.st_size;i++)
             char *end=strchr(lineStart,';');
             *end=0;
             memcpy(pointName,lineStart,end-lineStart+1);
-printf("%llX %s\n",lineStart,pointName);
             float derX=atof(end+1);
             end=strchr(end+1,';');
             float derY=atof(end+1);
@@ -356,10 +347,6 @@ printf("%llX %s\n",lineStart,pointName);
               break;
             idx++;
           }while(offset<fbuf+st.st_size);
-/*
-for(int i=0;i<pnum;i++)
-printf("%i: %.3f %.3f %.3f\n",i,points[i*3],points[i*3+1],points[i*3+2]);
-*/
         }
       }else{
         if(lParam==(LPARAM)hPointVel){
@@ -385,6 +372,7 @@ printf("%i: %.3f %.3f %.3f\n",i,points[i*3],points[i*3+1],points[i*3+2]);
       if(lParam==(LPARAM)hButtonStopTrajectory){
        doTrajectory=0;
        currentPoint=-1;
+       EnableWindow(hButtonRunTrajectory,1);
        EnableWindow(hButtonPauseTrajectory,0);
        EnableWindow(hButtonStopTrajectory,0);
       }
@@ -450,6 +438,40 @@ printf("%i: %.3f %.3f %.3f\n",i,points[i*3],points[i*3+1],points[i*3+2]);
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&newy,4);
        memcpy(lbuf+12,&c,4);
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
+      }
+      if(lParam==(LPARAM)hCPlusButton){
+       GetWindowText(hIncValue,lbuf,255);
+       float newc=c+atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&x,4);
+       memcpy(lbuf+8,&y,4);
+       memcpy(lbuf+12,&newc,4);
+       memcpy(lbuf+16,&vel,4);
+       sernumsent=sernum;
+       memcpy(lbuf+32,&sernumsent,4);
+
+       sendPacket(0,lbuf);
+      }
+      if(lParam==(LPARAM)hCMinusButton){
+       GetWindowText(hIncValue,lbuf,255);
+       float newc=c-atof(lbuf);
+       GetWindowText(hIncVelValue,lbuf,255);
+       float vel=atof(lbuf);
+
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf+4,&x,4);
+       memcpy(lbuf+8,&y,4);
+       memcpy(lbuf+12,&newc,4);
        memcpy(lbuf+16,&vel,4);
        sernumsent=sernum;
        memcpy(lbuf+32,&sernumsent,4);

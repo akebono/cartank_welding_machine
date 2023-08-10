@@ -3,3 +3,7 @@
 *.blend
 *.blend1
 *.blend2
+do.bat
+*.exe
+*.ex
+videos/

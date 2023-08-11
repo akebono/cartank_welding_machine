@@ -81,7 +81,8 @@ int curblob=0;
 char inCirc=0;
 float cr,cx,cy,cphi,cd;
 
-
+//against flickering
+float oldx,oldy,oldc,oldv,oldAxis1,oldAxis2,oldAxis3,oldL1,oldL2;
 
 float rollerY=6179.4,rollerX=10100;
 //
@@ -199,23 +200,43 @@ void draw(){
   }
 
   char lbuf[256];
-  sprintf(lbuf,"X:%.2f mm",x);
-  SetWindowText(hXactual,lbuf);
-  sprintf(lbuf,"Y:%.2f mm",y);
-  SetWindowText(hYactual,lbuf);
-  sprintf(lbuf,"C: %.2f deg",c);
-  SetWindowText(hZactual,lbuf);
-  sprintf(lbuf,"Vel: %.2f",velReceived);
-  SetWindowText(hVelactual,lbuf);
-
-
-  sprintf(lbuf,"%.1f / %.3f",Axis1,L1);
-  SetWindowText(hA1,lbuf);
-  sprintf(lbuf,"%.1f / %.3f",Axis2,L2);
-  SetWindowText(hA2,lbuf);
-  sprintf(lbuf,"%.1f",Axis3);
-  SetWindowText(hA3,lbuf);
-
+  if(oldx!=x){
+   sprintf(lbuf,"X:%.2f mm",x);
+   SetWindowText(hXactual,lbuf);
+   oldx=x;
+  }
+  if(oldy!=y){
+   sprintf(lbuf,"Y:%.2f mm",y);
+   SetWindowText(hYactual,lbuf);
+   oldy=y;
+  }
+  if(oldc!=c){
+   sprintf(lbuf,"C: %.2f deg",c);
+   SetWindowText(hZactual,lbuf);
+   oldc=c;
+  }
+  if(oldv!=velReceived){
+   sprintf(lbuf,"Vel: %.2f",velReceived);
+   SetWindowText(hVelactual,lbuf);
+   oldv=velReceived;
+  }
+  if(oldAxis1!=Axis1 || oldL1!=L1){
+   sprintf(lbuf,"%.1f / %.3f",Axis1,L1);
+   SetWindowText(hA1,lbuf);
+   oldAxis1=Axis1;
+   oldL1=L1;
+  }
+  if(oldAxis2!=Axis2 ||oldL2!=L2){
+   sprintf(lbuf,"%.1f / %.3f",Axis2,L2);
+   SetWindowText(hA2,lbuf);
+   oldAxis2=Axis2;
+   oldL2=L2;
+  }
+  if(oldAxis3!=Axis3){
+   sprintf(lbuf,"%.1f",Axis3);
+   SetWindowText(hA3,lbuf);
+   oldAxis3=Axis3;
+  }
   zoom*=zoom_d;
   tx+=tx_d*300;
   ty+=ty_d*300;

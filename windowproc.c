@@ -384,7 +384,7 @@ if(derType=='C'){
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       char lbuf[36];
+       unsigned char lbuf[36];
        memset(lbuf,0,36);
        memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
@@ -392,7 +392,7 @@ if(derType=='C'){
        memcpy(lbuf+16,&vel,4);
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hXMinusButton){
        GetWindowText(hIncValue,lbuf,255);
@@ -407,7 +407,7 @@ if(derType=='C'){
        memcpy(lbuf+16,&vel,4);
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hYPlusButton){
        GetWindowText(hIncValue,lbuf,255);
@@ -424,7 +424,7 @@ if(derType=='C'){
 
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hYMinusButton){
        GetWindowText(hIncValue,lbuf,255);
@@ -440,7 +440,7 @@ if(derType=='C'){
        memcpy(lbuf+16,&vel,4);
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hCPlusButton){
        GetWindowText(hIncValue,lbuf,255);
@@ -456,7 +456,7 @@ if(derType=='C'){
        memcpy(lbuf+16,&vel,4);
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hCMinusButton){
        GetWindowText(hIncValue,lbuf,255);
@@ -472,7 +472,7 @@ if(derType=='C'){
        memcpy(lbuf+16,&vel,4);
        memcpy(lbuf+32,&sernumstart,4);
 
-       sendPacket(0,lbuf);
+       sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hCopyLinButton){
 printf("OK\n");
@@ -496,6 +496,110 @@ printf("OK\n");
        SendMessage(hXCircEnd,WM_PAINT,0,0);
        SendMessage(hYCircEnd,WM_PAINT,0,0);
        SendMessage(hCCircEnd,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit00){
+       testword^=1;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit01){
+       testword^=2;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit02){
+       testword^=4;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit03){
+       testword^=8;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit04){
+       testword^=16;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit05){
+       testword^=32;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit06){
+       testword^=64;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit07){
+       testword^=128;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit08){
+       testword^=256;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit09){
+       testword^=512;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit10){
+       testword^=1024;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit11){
+       testword^=2048;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit12){
+       testword^=4096;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit13){
+       testword^=8192;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit14){
+       testword^=16384;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hBit15){
+       testword^=32768;
+       sprintf(lbuf,"%04X",testword);
+       SetWindowText(hSendTestWordInput,lbuf);
+       SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hSendTestWordButton){
+       char lbuf[36];
+       memset(lbuf,0,36);
+       lbuf[0]=3;
+       memcpy(lbuf+4,&testword,2);
+
+       sendPacket(lbuf);
       }
 //SetFocus(hTest);
     break;

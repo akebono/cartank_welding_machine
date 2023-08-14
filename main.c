@@ -49,11 +49,12 @@ HWND hIncVelLabel,hIncVelValue;
 
 
 HWND hBit00,hBit01,hBit02,hBit03,hBit04,hBit05,hBit06,hBit07,hBit08,hBit09,hBit10,hBit11,hBit12,hBit13,hBit14,hBit15;
+HWND hSendTestWordInput,hSendTestWordButton;
 SOCKET s;
 struct sockaddr rsa;
 int ralen=16;
 
-void sendPacket(unsigned int,unsigned char*);
+void sendPacket(unsigned char*);
 
 #include "draw.c"
 PIXELFORMATDESCRIPTOR pfd = { 0x28,   // size of this pfd
@@ -119,8 +120,8 @@ DWORD WINAPI thread(void*param){
   L2=*(float*)(buf+4);
   Axis3=*(float*)(buf+8);
   velReceived=*(float*)(buf+12);
-  status=*(unsigned short*)(buf+16);
-  sernumstart=*(unsigned short*)(buf+18);
+  status=*(unsigned int*)(buf+16);
+  sernumstart=*(unsigned short*)(buf+20);
   do{
     memset(buf,0,1501);
     len=recvfrom(s,buf,1500,0,&rsa,&ralen);
@@ -159,7 +160,7 @@ DWORD WINAPI thread(void*param){
   return 0;
 }
 
-void sendPacket(unsigned int type,unsigned char *lbuf){
+void sendPacket(unsigned char *lbuf){
  if(sendto(s,lbuf,36,0,&rsa,16)==-1)
   printf("send failed\n");
 }
@@ -299,22 +300,24 @@ printf("Codepage:%u\n",GetACP());
 
  hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,h+35,90,25,hwnd,0,0,0);
 
- hBit00=CreateWindow("BUTTON","0",WS_CHILD|WS_VISIBLE,800,h+35,12,20,hwnd,0,0,0);
- hBit01=CreateWindow("BUTTON","1",WS_CHILD|WS_VISIBLE,812,h+35,12,20,hwnd,0,0,0);
- hBit02=CreateWindow("BUTTON","2",WS_CHILD|WS_VISIBLE,824,h+35,12,20,hwnd,0,0,0);
- hBit03=CreateWindow("BUTTON","3",WS_CHILD|WS_VISIBLE,836,h+35,12,20,hwnd,0,0,0);
- hBit04=CreateWindow("BUTTON","4",WS_CHILD|WS_VISIBLE,848,h+35,12,20,hwnd,0,0,0);
- hBit05=CreateWindow("BUTTON","5",WS_CHILD|WS_VISIBLE,860,h+35,12,20,hwnd,0,0,0);
- hBit06=CreateWindow("BUTTON","6",WS_CHILD|WS_VISIBLE,872,h+35,12,20,hwnd,0,0,0);
- hBit07=CreateWindow("BUTTON","7",WS_CHILD|WS_VISIBLE,884,h+35,12,20,hwnd,0,0,0);
- hBit08=CreateWindow("BUTTON","8",WS_CHILD|WS_VISIBLE,896,h+35,12,20,hwnd,0,0,0);
- hBit09=CreateWindow("BUTTON","9",WS_CHILD|WS_VISIBLE,908,h+35,12,20,hwnd,0,0,0);
- hBit10=CreateWindow("BUTTON","A",WS_CHILD|WS_VISIBLE,920,h+35,12,20,hwnd,0,0,0);
- hBit11=CreateWindow("BUTTON","B",WS_CHILD|WS_VISIBLE,932,h+35,12,20,hwnd,0,0,0);
- hBit12=CreateWindow("BUTTON","C",WS_CHILD|WS_VISIBLE,944,h+35,12,20,hwnd,0,0,0);
- hBit13=CreateWindow("BUTTON","D",WS_CHILD|WS_VISIBLE,956,h+35,12,20,hwnd,0,0,0);
- hBit14=CreateWindow("BUTTON","E",WS_CHILD|WS_VISIBLE,968,h+35,12,20,hwnd,0,0,0);
- hBit15=CreateWindow("BUTTON","F",WS_CHILD|WS_VISIBLE,980,h+35,12,20,hwnd,0,0,0);
+ hBit15=CreateWindow("BUTTON","F",WS_CHILD|WS_VISIBLE,800,h+35,12,20,hwnd,0,0,0);
+ hBit14=CreateWindow("BUTTON","E",WS_CHILD|WS_VISIBLE,812,h+35,12,20,hwnd,0,0,0);
+ hBit13=CreateWindow("BUTTON","D",WS_CHILD|WS_VISIBLE,824,h+35,12,20,hwnd,0,0,0);
+ hBit12=CreateWindow("BUTTON","C",WS_CHILD|WS_VISIBLE,836,h+35,12,20,hwnd,0,0,0);
+ hBit11=CreateWindow("BUTTON","B",WS_CHILD|WS_VISIBLE,848,h+35,12,20,hwnd,0,0,0);
+ hBit10=CreateWindow("BUTTON","A",WS_CHILD|WS_VISIBLE,860,h+35,12,20,hwnd,0,0,0);
+ hBit09=CreateWindow("BUTTON","9",WS_CHILD|WS_VISIBLE,872,h+35,12,20,hwnd,0,0,0);
+ hBit08=CreateWindow("BUTTON","8",WS_CHILD|WS_VISIBLE,884,h+35,12,20,hwnd,0,0,0);
+ hBit07=CreateWindow("BUTTON","7",WS_CHILD|WS_VISIBLE,896,h+35,12,20,hwnd,0,0,0);
+ hBit06=CreateWindow("BUTTON","6",WS_CHILD|WS_VISIBLE,908,h+35,12,20,hwnd,0,0,0);
+ hBit05=CreateWindow("BUTTON","5",WS_CHILD|WS_VISIBLE,920,h+35,12,20,hwnd,0,0,0);
+ hBit04=CreateWindow("BUTTON","4",WS_CHILD|WS_VISIBLE,932,h+35,12,20,hwnd,0,0,0);
+ hBit03=CreateWindow("BUTTON","3",WS_CHILD|WS_VISIBLE,944,h+35,12,20,hwnd,0,0,0);
+ hBit02=CreateWindow("BUTTON","2",WS_CHILD|WS_VISIBLE,956,h+35,12,20,hwnd,0,0,0);
+ hBit01=CreateWindow("BUTTON","1",WS_CHILD|WS_VISIBLE,968,h+35,12,20,hwnd,0,0,0);
+ hBit00=CreateWindow("BUTTON","0",WS_CHILD|WS_VISIBLE,980,h+35,12,20,hwnd,0,0,0);
+ hSendTestWordInput=CreateWindow("EDIT","0000",WS_CHILD|WS_VISIBLE|WS_BORDER,850,h+55,50,25,hwnd,0,0,0);
+ hSendTestWordButton=CreateWindow("BUTTON","Send",WS_CHILD|WS_VISIBLE|WS_BORDER,900,h+55,50,25,hwnd,0,0,0);
 
  char lbuf[256];
  sprintf(lbuf,"%.1f",A1offset);

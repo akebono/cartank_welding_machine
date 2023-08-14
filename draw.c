@@ -30,11 +30,14 @@ float dL1=0,dL2=0,dA3=0;
 
 float x,y,z=0,c,xc,yc,zc=0,oldx,oldy,oldz;
 float velReceived;
-unsigned short status;
+unsigned int status;
 unsigned short sernumstart=500;
 unsigned short sernumsent=-1;
 unsigned short sernumback=0;
 unsigned short sernumwindow=0;
+
+unsigned short testword=0;
+
 double dx=0,dy=0,d3=0;
 float xe,ye,ce,a3e,a3a;
 float traj[POINTS][3];
@@ -189,7 +192,7 @@ void draw(){
     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
     sernumsent=sernumstart+currentPoint;
     memcpy(lbuf+32,&sernumsent,2);
-    sendPacket(trajectory[currentPoint].type,lbuf);
+    sendPacket(lbuf);
     printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
     currentPoint++;
     if(currentPoint==trajectoryLength){
@@ -667,6 +670,10 @@ glEnable(GL_LIGHTING);
   glPopMatrix();
   glPopMatrix();
   glPopMatrix();
+  if(status&0x80000000)
+   glClearColor(1,0,0,1);
+  else
+   glClearColor(1,0,0,1);
 }
 
 int load_model(char *modelname){

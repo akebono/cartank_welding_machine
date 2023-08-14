@@ -281,16 +281,24 @@ trajc[curpt][1]=yc;
   glEnd();
 
 
-  glEnable(GL_LIGHTING);
 
 
   glColor3f(0.5,0.5,0.5);
   glBegin(GL_LINES);
-  for(int i=0;i<21;i++){
-    glVertex3f(-20000,-20000+2000*i,0);
-    glVertex3f(20000,-20000+2000*i,0);
-    glVertex3f(-20000+2000*i,-20000,0);
-    glVertex3f(-20000+2000*i,20000,0);
+  for(int i=0;i<41;i++){
+    glVertex3f(-20000,-20000+1000*i,0);
+    glVertex3f(20000,-20000+1000*i,0);
+    glVertex3f(-20000+1000*i,-20000,0);
+    glVertex3f(-20000+1000*i,20000,0);
+  }
+  glColor3f(0.1,0.1,0.3);
+  if(zoom<0.1){
+   for(int i=0;i<4001;i++){
+    glVertex3f(-20000,-20000+10*i,0);
+    glVertex3f(20000,-20000+10*i,0);
+    glVertex3f(-20000+10*i,-20000,0);
+    glVertex3f(-20000+10*i,20000,0);
+   }
   }
   glEnd();
   glColor3f(1,0,0);

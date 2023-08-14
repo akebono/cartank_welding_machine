@@ -133,7 +133,7 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
        memcpy(lbuf+8,&ly,4);
        memcpy(lbuf+12,&lc,4);
        memcpy(lbuf+16,&lvel,4);
-       memcpy(lbuf+20,&sernum,4);
+       memcpy(lbuf+20,&sernumstart,4);
        lbuf[0]=0;
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
        if(sendto(s,lbuf,32,0,&rsa,16)==-1)
@@ -215,7 +215,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        memcpy(lbuf+20,&xa,4);
        memcpy(lbuf+24,&ya,4);
        memcpy(lbuf+28,&ca,4);
-       memcpy(lbuf+32,&sernum,4);
+       memcpy(lbuf+32,&sernumstart,4);
        if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
       }
@@ -261,7 +261,8 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
             *end=0;
             memcpy(pointName,lineStart,end-lineStart+1);
             sprintf(li.pszText,pointName);
-
+            trajectory[pnum].name=malloc(strlen(pointName)+1);
+            sprintf(trajectory[pnum].name,pointName);
             li.iSubItem=0;
             SendMessage(hTest,LVM_INSERTITEM,0,(LPARAM)&li);
 
@@ -389,8 +390,7 @@ if(derType=='C'){
        memcpy(lbuf+8,&y,4);
        memcpy(lbuf+12,&c,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
       }
@@ -405,8 +405,7 @@ if(derType=='C'){
        memcpy(lbuf+8,&y,4);
        memcpy(lbuf+12,&c,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
       }
@@ -422,8 +421,8 @@ if(derType=='C'){
        memcpy(lbuf+8,&newy,4);
        memcpy(lbuf+12,&c,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
       }
@@ -439,8 +438,7 @@ if(derType=='C'){
        memcpy(lbuf+8,&newy,4);
        memcpy(lbuf+12,&c,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
       }
@@ -456,8 +454,7 @@ if(derType=='C'){
        memcpy(lbuf+8,&y,4);
        memcpy(lbuf+12,&newc,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
       }
@@ -473,10 +470,32 @@ if(derType=='C'){
        memcpy(lbuf+8,&y,4);
        memcpy(lbuf+12,&newc,4);
        memcpy(lbuf+16,&vel,4);
-       sernumsent=sernum;
-       memcpy(lbuf+32,&sernumsent,4);
+       memcpy(lbuf+32,&sernumstart,4);
 
        sendPacket(0,lbuf);
+      }
+      if(lParam==(LPARAM)hCopyLinButton){
+printf("OK\n");
+       sprintf(lbuf,"%.3f",x);
+       SetWindowText(hXLin,lbuf);
+       sprintf(lbuf,"%.3f",y);
+       SetWindowText(hYLin,lbuf);
+       sprintf(lbuf,"%.3f",c);
+       SetWindowText(hCLin,lbuf);
+       SendMessage(hXLin,WM_PAINT,0,0);
+       SendMessage(hYLin,WM_PAINT,0,0);
+       SendMessage(hCLin,WM_PAINT,0,0);
+      }
+      if(lParam==(LPARAM)hCopyCircButton){
+       sprintf(lbuf,"%.3f",x);
+       SetWindowText(hXCircEnd,lbuf);
+       sprintf(lbuf,"%.3f",y);
+       SetWindowText(hYCircEnd,lbuf);
+       sprintf(lbuf,"%.3f",c);
+       SetWindowText(hCCircEnd,lbuf);
+       SendMessage(hXCircEnd,WM_PAINT,0,0);
+       SendMessage(hYCircEnd,WM_PAINT,0,0);
+       SendMessage(hCCircEnd,WM_PAINT,0,0);
       }
 //SetFocus(hTest);
     break;
@@ -582,16 +601,16 @@ LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
     // doLine();
     break;
     case 0x25:
-      tx_d=-0.02;
+      tx_d=-t_vel;
     break;
     case 0x26:
-      ty_d=0.02;
+      ty_d=t_vel;
     break;
     case 0x27:
-      tx_d=0.02;
+      tx_d=t_vel;
     break;
     case 0x28:
-      ty_d=-0.02;
+      ty_d=-t_vel;
     break;
     case 0x6B: //-
       zoom_d=1/1.01;

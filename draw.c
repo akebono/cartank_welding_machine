@@ -13,7 +13,7 @@ float zoom_d=1;
 float shift[3];
 float tx=10,ty=6,tz=0;
 float tx_d=0,ty_d=0;
-
+float t_vel=0.01;
 float lipos[4]={-1000,2000,4000,1};
 float lipar[4]={1,1,1,1};
 float mat[4]={1,1,1,1};
@@ -31,10 +31,10 @@ float dL1=0,dL2=0,dA3=0;
 float x,y,z=0,c,xc,yc,zc=0,oldx,oldy,oldz;
 float velReceived;
 unsigned short status;
-unsigned short sernum=0;
+unsigned short sernumstart=500;
 unsigned short sernumsent=-1;
 unsigned short sernumback=0;
-
+unsigned short sernumwindow=0;
 double dx=0,dy=0,d3=0;
 float xe,ye,ce,a3e,a3a;
 float traj[POINTS][3];
@@ -42,6 +42,7 @@ float trajc[POINTS][3];
 int curpt=0;
 
 struct point{
+ char *name;
  unsigned int type; //not char, because controller's BOOL is 4 bytes wide
  float x;
  float y;
@@ -123,14 +124,14 @@ void doLine(){
 
  x+=dx;
  y+=dy;
-if(dx>0 && x>xe
- ||dx<0 && x<xe
- ||dy>0 && y>ye
- ||dy<0 && y<ye){
+ if(dx>0 && x>xe ||dx<0 && x<xe){
   task=0;
-//  x=xe;
-//  y=ye;
-}
+  x=xe;
+ }
+ if(dy>0 && y>ye || dy<0 && y<ye){
+  task=0;
+  y=ye;
+ }
 
 //printf("x=%.4f(%f) y=%.4f(%f)\n",x,dx,y,dy);
  doInverse();
@@ -174,7 +175,7 @@ void draw(){
 
   doCalc();
 
-  if((sernumback==sernumsent) && (!(status&45))){
+  if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
    if(doTrajectory){
     char lbuf[36];
     memset(lbuf,0,36);
@@ -186,12 +187,13 @@ void draw(){
     memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
     memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
-    sernumsent=sernum;
+    sernumsent=sernumstart+currentPoint;
     memcpy(lbuf+32,&sernumsent,2);
     sendPacket(trajectory[currentPoint].type,lbuf);
-    printf("current point:%i(%i)\n",currentPoint,trajectoryLength);
+    printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
     currentPoint++;
     if(currentPoint==trajectoryLength){
+     sernumstart=sernumback;
      EnableWindow(hButtonRunTrajectory,1);
      currentPoint=-1;
      doTrajectory=0;

@@ -39,6 +39,8 @@ HWND hXactual,hYactual,hZactual,hVelactual;
 HWND hA1,hA2,hA3,hA4,hA5;
 HWND hAxesLabel;
 
+HWND hCopyLinButton,hCopyCircButton;
+
 HWND hResetErrorButton;
 
 HWND hXPlusButton,hXMinusButton,hYPlusButton,hYMinusButton,hCPlusButton,hCMinusButton;
@@ -109,30 +111,37 @@ DWORD WINAPI thread(void*param){
     return 1;
   }
   SetWindowText(hStatus,"Awating for coordinates");
+  memset(buf,0,1501);
+  len=recvfrom(s,buf,1500,0,&rsa,&ralen);
+  L1=*(float*)(buf);
+  L2=*(float*)(buf+4);
+  Axis3=*(float*)(buf+8);
+  velReceived=*(float*)(buf+12);
+  status=*(unsigned short*)(buf+16);
+  sernumstart=*(unsigned short*)(buf+18);
   do{
     memset(buf,0,1501);
     len=recvfrom(s,buf,1500,0,&rsa,&ralen);
     if(!len) break;
-printf("packet length is %i\n",len);
+
     L1=*(float*)(buf);
     L2=*(float*)(buf+4);
     Axis3=*(float*)(buf+8);
     velReceived=*(float*)(buf+12);
     status=*(unsigned short*)(buf+16);
     sernumback=*(unsigned short*)(buf+18);
+    sernumwindow=0;
 
-    sprintf(lbuf,"%04X (%u,%u)\n",status,sernumback,sernum);
-
+    sprintf(lbuf,"%04X (%u,%u) %i %i\n",status,sernumback,sernumstart+currentPoint,((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9),doTrajectory);
     SetWindowText(hStatus,lbuf);
 
-    if(sernumback==sernumsent){
+    if(sernumback==sernumstart+pnum){
 //enable command buttons
 //     EnableWindow(hButtonRunTrajectory,1);
      EnableWindow(hXPlusButton,1);
      EnableWindow(hXMinusButton,1);
      EnableWindow(hYPlusButton,1);
      EnableWindow(hYMinusButton,1);
-     sernum=sernumback+1;
     }
     doCalc();
 
@@ -233,7 +242,8 @@ printf("Codepage:%u\n",GetACP());
 
  hButtonErase=CreateWindow("BUTTON","Erase",WS_CHILD|WS_VISIBLE,550,h,50,25,hwnd,0,0,0);
 
- hLinetoButton=CreateWindow("BUTTON","Move to:",WS_CHILD|WS_VISIBLE,340,h,90,25,hwnd,0,0,0);
+ hCopyLinButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,340,h,20,25,hwnd,0,0,0);
+ hLinetoButton=CreateWindow("BUTTON","Move to:",WS_CHILD|WS_VISIBLE,360,h,70,25,hwnd,0,0,0);
  hXLinLabel=CreateWindow("STATIC","X:",WS_CHILD|WS_VISIBLE,340,h+25,35,25,hwnd,0,0,0);
  hYLinLabel=CreateWindow("STATIC","Y:",WS_CHILD|WS_VISIBLE,340,h+50,35,25,hwnd,0,0,0);
  hCLinLabel=CreateWindow("STATIC","C:",WS_CHILD|WS_VISIBLE,340,h+75,35,25,hwnd,0,0,0);
@@ -244,7 +254,8 @@ printf("Codepage:%u\n",GetACP());
  hLinVel=CreateWindow("EDIT","100",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+100,55,25,hwnd,0,0,0);
 
  
- hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,430,h,95,25,hwnd,0,0,0);
+ hCopyCircButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,430,h,20,25,hwnd,0,0,0);
+ hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,450,h,75,25,hwnd,0,0,0);
  hXCircEndLabel=CreateWindow("STATIC","end X:",WS_CHILD|WS_VISIBLE,430,h+25,45,25,hwnd,0,0,0);
  hYCircEndLabel=CreateWindow("STATIC","end Y:",WS_CHILD|WS_VISIBLE,430,h+50,45,25,hwnd,0,0,0);
  hCCircEndLabel=CreateWindow("STATIC","end C:",WS_CHILD|WS_VISIBLE,430,h+75,45,25,hwnd,0,0,0);

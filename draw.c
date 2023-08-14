@@ -670,10 +670,8 @@ glEnable(GL_LIGHTING);
   glPopMatrix();
   glPopMatrix();
   glPopMatrix();
-  if(status&0x80000000)
-   glClearColor(1,0,0,1);
-  else
-   glClearColor(1,0,0,1);
+
+
 }
 
 int load_model(char *modelname){

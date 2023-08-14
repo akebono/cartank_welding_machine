@@ -131,11 +131,11 @@ DWORD WINAPI thread(void*param){
     L2=*(float*)(buf+4);
     Axis3=*(float*)(buf+8);
     velReceived=*(float*)(buf+12);
-    status=*(unsigned short*)(buf+16);
-    sernumback=*(unsigned short*)(buf+18);
+    status=*(unsigned int*)(buf+16);
+    sernumback=*(unsigned short*)(buf+20);
     sernumwindow=0;
 
-    sprintf(lbuf,"%04X (%u,%u) %i %i\n",status,sernumback,sernumstart+currentPoint,((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9),doTrajectory);
+    sprintf(lbuf,"%08X (%u,%u) %i %i\n",status,sernumback,sernumstart+currentPoint,((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9),doTrajectory);
     SetWindowText(hStatus,lbuf);
 
     if(sernumback==sernumstart+pnum){
@@ -288,6 +288,8 @@ printf("Codepage:%u\n",GetACP());
  hA3=CreateWindow("STATIC","0",WS_CHILD|WS_VISIBLE,120,h+75,200,25,hwnd,0,0,0);
 
  hIncLabel=CreateWindow("STATIC","Increment Step(mm):",WS_CHILD|WS_VISIBLE,120,h+120,140,25,hwnd,0,0,0);
+
+
  hIncValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+120,50,25,hwnd,0,0,0);
  hIncVelLabel=CreateWindow("STATIC","Velocity(mm/s):",WS_CHILD|WS_VISIBLE,120,h+145,140,25,hwnd,0,0,0);
  hIncVelValue=CreateWindow("EDIT","10",WS_CHILD|WS_VISIBLE|WS_BORDER,260,h+145,50,25,hwnd,0,0,0);

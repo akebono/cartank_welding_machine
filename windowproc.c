@@ -19,7 +19,22 @@ LRESULT CALLBACK WinProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
     break;
     case WM_PAINT:
-      glClearColor(0,0,0,0);
+      //glClearColor(0,0,0,0);
+/*
+ HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
+// HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)hIncLabel)->hdc);
+HDC hdcmem=GetDC(hIncLabel);
+ RECT temp;
+ temp.left=0;
+ temp.top=0;
+ temp.right=140;
+ temp.bottom=25;
+ FillRect(hdcmem, &temp, brush);
+*/
+      if(status&0x80000000)
+       glClearColor(1,0,0,1);
+      else
+       glClearColor(0,0,0,1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       draw();
       glFinish();
@@ -475,23 +490,22 @@ if(derType=='C'){
        sendPacket(lbuf);
       }
       if(lParam==(LPARAM)hCopyLinButton){
-printf("OK\n");
-       sprintf(lbuf,"%.3f",x);
+       sprintf(lbuf,"%.1f",x);
        SetWindowText(hXLin,lbuf);
-       sprintf(lbuf,"%.3f",y);
+       sprintf(lbuf,"%.1f",y);
        SetWindowText(hYLin,lbuf);
-       sprintf(lbuf,"%.3f",c);
+       sprintf(lbuf,"%.1f",c);
        SetWindowText(hCLin,lbuf);
        SendMessage(hXLin,WM_PAINT,0,0);
        SendMessage(hYLin,WM_PAINT,0,0);
        SendMessage(hCLin,WM_PAINT,0,0);
       }
       if(lParam==(LPARAM)hCopyCircButton){
-       sprintf(lbuf,"%.3f",x);
+       sprintf(lbuf,"%.1f",x);
        SetWindowText(hXCircEnd,lbuf);
-       sprintf(lbuf,"%.3f",y);
+       sprintf(lbuf,"%.1f",y);
        SetWindowText(hYCircEnd,lbuf);
-       sprintf(lbuf,"%.3f",c);
+       sprintf(lbuf,"%.1f",c);
        SetWindowText(hCCircEnd,lbuf);
        SendMessage(hXCircEnd,WM_PAINT,0,0);
        SendMessage(hYCircEnd,WM_PAINT,0,0);
@@ -670,7 +684,11 @@ LRESULT CALLBACK WinProcEdit(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
  switch(msg){
    case WM_PAINT:
-     glClearColor(0,0,0,0);
+     //glClearColor(0,0,0,0);
+     if(status&0x80000000)
+      glClearColor(1,0,0,1);
+     else
+      glClearColor(0,0,0,1);
      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
      draw();
      glFinish();

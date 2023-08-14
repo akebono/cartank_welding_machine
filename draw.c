@@ -293,11 +293,11 @@ trajc[curpt][1]=yc;
   }
   glColor3f(0.1,0.1,0.3);
   if(zoom<0.1){
-   for(int i=0;i<4001;i++){
-    glVertex3f(-20000,-20000+10*i,0);
-    glVertex3f(20000,-20000+10*i,0);
-    glVertex3f(-20000+10*i,-20000,0);
-    glVertex3f(-20000+10*i,20000,0);
+   for(int i=0;i<40001;i++){
+    glVertex3f(-20000,-20000+1*i,0);
+    glVertex3f(20000,-20000+1*i,0);
+    glVertex3f(-20000+1*i,-20000,0);
+    glVertex3f(-20000+1*i,20000,0);
    }
   }
   glEnd();

@@ -127,16 +127,16 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
 //       task=1;
 
-       char lbuf[32];
-       memset(lbuf,0,32);
+       char lbuf[36];
+       memset(lbuf,0,36);
        memcpy(lbuf+4,&lx,4);
        memcpy(lbuf+8,&ly,4);
        memcpy(lbuf+12,&lc,4);
        memcpy(lbuf+16,&lvel,4);
-       memcpy(lbuf+20,&sernumstart,4);
+       memcpy(lbuf+32,&sernumstart,4);
        lbuf[0]=0;
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
-       if(sendto(s,lbuf,32,0,&rsa,16)==-1)
+       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 
@@ -206,7 +206,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
 //Axis3=a3e;
 //       inCirc=1;
 
-       memset(lbuf,0,32);
+       memset(lbuf,0,36);
        lbuf[0]=1;
        memcpy(lbuf+4,&xe,4);
        memcpy(lbuf+8,&ye,4);
@@ -221,9 +221,9 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
       }
 
       if(lParam==(LPARAM)hResetErrorButton){
-       memset(lbuf,0,32);
+       memset(lbuf,0,36);
        lbuf[0]=2;
-       if(sendto(s,lbuf,32,0,&rsa,16)==-1)
+       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 

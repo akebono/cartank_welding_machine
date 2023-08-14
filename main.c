@@ -47,6 +47,8 @@ HWND hXPlusButton,hXMinusButton,hYPlusButton,hYMinusButton,hCPlusButton,hCMinusB
 HWND hIncLabel,hIncValue;
 HWND hIncVelLabel,hIncVelValue;
 
+
+HWND hBit00,hBit01,hBit02,hBit03,hBit04,hBit05,hBit06,hBit07,hBit08,hBit09,hBit10,hBit11,hBit12,hBit13,hBit14,hBit15;
 SOCKET s;
 struct sockaddr rsa;
 int ralen=16;
@@ -295,8 +297,24 @@ printf("Codepage:%u\n",GetACP());
  hCPlusButton=CreateWindow("BUTTON","C+",WS_CHILD|WS_VISIBLE,280,h+170,40,25,hwnd,0,0,0);
  hCMinusButton=CreateWindow("BUTTON","C-",WS_CHILD|WS_VISIBLE,320,h+170,40,25,hwnd,0,0,0);
 
-
  hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,h+35,90,25,hwnd,0,0,0);
+
+ hBit00=CreateWindow("BUTTON","0",WS_CHILD|WS_VISIBLE,800,h+35,12,20,hwnd,0,0,0);
+ hBit01=CreateWindow("BUTTON","1",WS_CHILD|WS_VISIBLE,812,h+35,12,20,hwnd,0,0,0);
+ hBit02=CreateWindow("BUTTON","2",WS_CHILD|WS_VISIBLE,824,h+35,12,20,hwnd,0,0,0);
+ hBit03=CreateWindow("BUTTON","3",WS_CHILD|WS_VISIBLE,836,h+35,12,20,hwnd,0,0,0);
+ hBit04=CreateWindow("BUTTON","4",WS_CHILD|WS_VISIBLE,848,h+35,12,20,hwnd,0,0,0);
+ hBit05=CreateWindow("BUTTON","5",WS_CHILD|WS_VISIBLE,860,h+35,12,20,hwnd,0,0,0);
+ hBit06=CreateWindow("BUTTON","6",WS_CHILD|WS_VISIBLE,872,h+35,12,20,hwnd,0,0,0);
+ hBit07=CreateWindow("BUTTON","7",WS_CHILD|WS_VISIBLE,884,h+35,12,20,hwnd,0,0,0);
+ hBit08=CreateWindow("BUTTON","8",WS_CHILD|WS_VISIBLE,896,h+35,12,20,hwnd,0,0,0);
+ hBit09=CreateWindow("BUTTON","9",WS_CHILD|WS_VISIBLE,908,h+35,12,20,hwnd,0,0,0);
+ hBit10=CreateWindow("BUTTON","A",WS_CHILD|WS_VISIBLE,920,h+35,12,20,hwnd,0,0,0);
+ hBit11=CreateWindow("BUTTON","B",WS_CHILD|WS_VISIBLE,932,h+35,12,20,hwnd,0,0,0);
+ hBit12=CreateWindow("BUTTON","C",WS_CHILD|WS_VISIBLE,944,h+35,12,20,hwnd,0,0,0);
+ hBit13=CreateWindow("BUTTON","D",WS_CHILD|WS_VISIBLE,956,h+35,12,20,hwnd,0,0,0);
+ hBit14=CreateWindow("BUTTON","E",WS_CHILD|WS_VISIBLE,968,h+35,12,20,hwnd,0,0,0);
+ hBit15=CreateWindow("BUTTON","F",WS_CHILD|WS_VISIBLE,980,h+35,12,20,hwnd,0,0,0);
 
  char lbuf[256];
  sprintf(lbuf,"%.1f",A1offset);

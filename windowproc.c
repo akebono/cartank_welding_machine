@@ -386,6 +386,7 @@ printf("trajectory length:%i\n",trajectoryLength);
          EnableWindow(hButtonOpen,0);
         }
         else if(currentPoint==-1){
+         trajectoryDone=0;
          currentPoint=0;
          doTrajectory=1;
          SetWindowText(hButtonRunTrajectory,"Pause");
@@ -400,8 +401,10 @@ printf("trajectory length:%i\n",trajectoryLength);
        doTrajectory=0;
        EnableWindow(hButtonResetTrajectory,1);
       }
+
       if(lParam==(LPARAM)hButtonResetTrajectory){
        doTrajectory=0;
+       trajectoryDone=0;
        currentPoint=-1;
        SetWindowText(hButtonRunTrajectory,"Run");
        sernumstart=sernumback;
@@ -645,70 +648,7 @@ printf("trajectory length:%i\n",trajectoryLength);
       }
 //SetFocus(hTest);
     break;
-    case WM_NOTIFY:
-      if(((NMHDR*)lParam)->hwndFrom==hButtonOpen){
-       printf("notify code=%i\n",((NMLISTVIEW*)lParam)->hdr.code/*((NMHDR*)lParam)->code*/);
-       //printf("LVN_ITEMACTIVATE %llX\n",LVN_ITEMACTIVATE);
-//       printf("LVN_ITEMCHANGED (%i)%i\n",((NMLISTVIEW*)lParam)->hdr.code,LVN_ITEMCHANGED);
-//printf("WM %llX\n",
-switch(((NMHDR*)lParam)->code){
- case LVN_ITEMACTIVATE:
-//  printf("item activate %i %i\n",((NMITEMACTIVATE*)lParam)->iItem,((NMITEMACTIVATE*)lParam)->iSubItem);
- break;
 
- case LVN_ITEMCHANGED:
-//  printf("item changed %i %i\n",((NMLISTVIEW*)lParam)->iItem,((NMLISTVIEW*)lParam)->iSubItem); break;
- break;
-
- case NM_CUSTOMDRAW:
-printf("AA\n");
-  LPNMLVCUSTOMDRAW  lplvcd = (LPNMLVCUSTOMDRAW)lParam;
- if(lplvcd->nmcd.dwDrawStage==CDDS_PREPAINT){
-printf("CDDS_PREPAINT received\n");
-        return CDRF_NOTIFYITEMDRAW;
- }else if(lplvcd->nmcd.dwDrawStage==CDDS_ITEMPREPAINT){
-printf("CDDS_ITEMPREPAINT received\n");
-
-/*  SelectObject(lplvcd->nmcd.hdc,GetFontForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam) );
-  lplvcd->clrText = GetColorForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam);
-  lplvcd->clrTextBk = GetBkColorForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam);
-*/
-  HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
-  HDC hdcmem=GetDC(((NMHDR*)lParam)->hwndFrom);
-  HGDIOBJ old_pen = SelectObject(hdcmem, pen);
-  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
-  HGDIOBJ old_brush = SelectObject(hdcmem, brush);
-  return CDRF_NEWFONT;
-
-/*  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
-// HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)(((NMHDR*)lParam)->hwndFrom))->hdc);
-  HDC hdcmem=GetDC(hTest);
-  RECT temp;
-  temp.left=0;
-  temp.top=0;
-  temp.right=140;
-  temp.bottom=25;
-  HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
-  HGDIOBJ old_pen = SelectObject(hdcmem, pen);
-  HGDIOBJ old_brush = SelectObject(hdcmem, brush);
-  FillRect(hdcmem, &temp, brush);
-  SelectObject(hdcmem,old_pen);
-  SelectObject(hdcmem,old_brush);
-  return CDRF_DODEFAULT;
-*/
-  //return DefWindowProc(hwnd,msg,wParam,lParam);
-}
- break;
- case NM_CLICK:
-  //printf("click %i %i\n",((NMITEMACTIVATE*)lParam)->iItem,((NMITEMACTIVATE*)lParam)->iSubItem);
-  SendMessage(hTest,WM_PAINT,0,0);
- break;
- default:
-;
-//  printf("some code:%i (%i)\n",((NMHDR*)lParam)->code,NM_FIRST);
-}
-      }
-    break;
     case WM_DESTROY:
       PostQuitMessage(0);
     break;

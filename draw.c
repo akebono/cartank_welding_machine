@@ -59,7 +59,7 @@ struct point{
 struct point trajectory[256];
 int trajectoryLength=0;
 int currentPoint=-1;
-char doTrajectory=0,doStep=0;
+char doTrajectory=0,doStep=0,trajectoryDone=0;
 
 
 float A1offset=600;
@@ -201,17 +201,22 @@ void draw(){
    }
    doStep=0;
   }
-
-  if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
-   if(doTrajectory){
-    if(sernumback-sernumstart+1==trajectoryLength || currentPoint==trajectoryLength){
-printf("current point %i\n",currentPoint);
-     SetWindowText(hButtonRunTrajectory,"Run");
-     sernumstart=sernumback;
-     EnableWindow(hButtonRunTrajectory,1);
-     currentPoint=-1;
-     doTrajectory=0;
-    }else{
+  if(!trajectoryDone){
+   if(sernumback-sernumstart+1==trajectoryLength){
+    SetWindowText(hButtonRunTrajectory,"Run");
+    sernumstart=sernumback;
+    EnableWindow(hButtonRunTrajectory,1);
+    trajectoryDone=1;
+   }
+  }
+  if(doTrajectory){
+   if(currentPoint==trajectoryLength){
+//printf("end of trajectory length:%i\n",currentPoint);
+    doTrajectory=0;
+    currentPoint=-1;
+   }else{
+    if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
+     printf("sending packet:%i\n",sernumsent);
      char lbuf[36];
      memset(lbuf,0,36);
      memcpy(lbuf,&trajectory[currentPoint].type,4);

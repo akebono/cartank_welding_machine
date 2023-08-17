@@ -335,7 +335,12 @@ if(derType=='C'){
             pnum++;
           }while(offset<fbuf+st.st_size);
           trajectoryLength=pnum;
+printf("trajectory length:%i\n",trajectoryLength);
           SendMessage(hTest,WM_PAINT,0,0);
+          if(pnum>0){
+           EnableWindow(hButtonRunTrajectory,1);
+           EnableWindow(hButtonStepTrajectory,1);
+          }
           offset=fbuf;
 
           for(int i=0;i<st.st_size;i++)
@@ -343,6 +348,7 @@ if(derType=='C'){
             *(fbuf+i)=';';
 
           int idx=0;
+/*
           do{
             lineStart=offset;
             offset=strchr(offset,'\n')+1;
@@ -363,6 +369,7 @@ if(derType=='C'){
               break;
             idx++;
           }while(offset<fbuf+st.st_size);
+*/
         }
       }else{
         if(lParam==(LPARAM)hPointVel){
@@ -372,25 +379,35 @@ if(derType=='C'){
         }
       }
       if(lParam==(LPARAM)hButtonRunTrajectory){
-        if(currentPoint==-1){
+        if(doTrajectory==1){
+         doTrajectory=0;
+         SetWindowText(hButtonRunTrajectory,"Run");
+         EnableWindow(hButtonStepTrajectory,1);
+         EnableWindow(hButtonOpen,0);
+        }
+        else if(currentPoint==-1){
          currentPoint=0;
          doTrajectory=1;
-         EnableWindow(hButtonRunTrajectory,0);
-         EnableWindow(hButtonPauseTrajectory,1);
-         EnableWindow(hButtonStopTrajectory,1);
+         SetWindowText(hButtonRunTrajectory,"Pause");
+         EnableWindow(hButtonResetTrajectory,1);
+         EnableWindow(hButtonStepTrajectory,0);
+         EnableWindow(hButtonOpen,1);
         }
       }
 
-      if(lParam==(LPARAM)hButtonPauseTrajectory){
+      if(lParam==(LPARAM)hButtonStepTrajectory){
+       doStep=1;
        doTrajectory=0;
-       EnableWindow(hButtonRunTrajectory,1);
+       EnableWindow(hButtonResetTrajectory,1);
       }
-      if(lParam==(LPARAM)hButtonStopTrajectory){
+      if(lParam==(LPARAM)hButtonResetTrajectory){
        doTrajectory=0;
        currentPoint=-1;
+       SetWindowText(hButtonRunTrajectory,"Run");
+       sernumstart=sernumback;
        EnableWindow(hButtonRunTrajectory,1);
-       EnableWindow(hButtonPauseTrajectory,0);
-       EnableWindow(hButtonStopTrajectory,0);
+       EnableWindow(hButtonResetTrajectory,0);
+       EnableWindow(hButtonStepTrajectory,1);
       }
 
       if(lParam==(LPARAM)hXPlusButton){
@@ -511,6 +528,17 @@ if(derType=='C'){
        SendMessage(hYCircEnd,WM_PAINT,0,0);
        SendMessage(hCCircEnd,WM_PAINT,0,0);
       }
+      if(lParam==(LPARAM)hCopyCircAuxButton){
+       sprintf(lbuf,"%.1f",x);
+       SetWindowText(hXCircAux,lbuf);
+       sprintf(lbuf,"%.1f",y);
+       SetWindowText(hYCircAux,lbuf);
+       sprintf(lbuf,"%.1f",c);
+       SetWindowText(hCCircAux,lbuf);
+       SendMessage(hXCircAux,WM_PAINT,0,0);
+       SendMessage(hYCircAux,WM_PAINT,0,0);
+       SendMessage(hCCircAux,WM_PAINT,0,0);
+      }
       if(lParam==(LPARAM)hBit00){
        testword^=1;
        sprintf(lbuf,"%04X",testword);
@@ -618,8 +646,8 @@ if(derType=='C'){
 //SetFocus(hTest);
     break;
     case WM_NOTIFY:
-      if(((NMHDR*)lParam)->hwndFrom==hTest){
-//       printf("notify code=%i\n",((NMLISTVIEW*)lParam)->hdr.code/*((NMHDR*)lParam)->code*/);
+      if(((NMHDR*)lParam)->hwndFrom==hButtonOpen){
+       printf("notify code=%i\n",((NMLISTVIEW*)lParam)->hdr.code/*((NMHDR*)lParam)->code*/);
        //printf("LVN_ITEMACTIVATE %llX\n",LVN_ITEMACTIVATE);
 //       printf("LVN_ITEMCHANGED (%i)%i\n",((NMLISTVIEW*)lParam)->hdr.code,LVN_ITEMCHANGED);
 //printf("WM %llX\n",
@@ -633,7 +661,43 @@ switch(((NMHDR*)lParam)->code){
  break;
 
  case NM_CUSTOMDRAW:
-  return DefWindowProc(hwnd,msg,wParam,lParam);
+printf("AA\n");
+  LPNMLVCUSTOMDRAW  lplvcd = (LPNMLVCUSTOMDRAW)lParam;
+ if(lplvcd->nmcd.dwDrawStage==CDDS_PREPAINT){
+printf("CDDS_PREPAINT received\n");
+        return CDRF_NOTIFYITEMDRAW;
+ }else if(lplvcd->nmcd.dwDrawStage==CDDS_ITEMPREPAINT){
+printf("CDDS_ITEMPREPAINT received\n");
+
+/*  SelectObject(lplvcd->nmcd.hdc,GetFontForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam) );
+  lplvcd->clrText = GetColorForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam);
+  lplvcd->clrTextBk = GetBkColorForItem(lplvcd->nmcd.dwItemSpec,lplvcd->nmcd.lItemlParam);
+*/
+  HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+  HDC hdcmem=GetDC(((NMHDR*)lParam)->hwndFrom);
+  HGDIOBJ old_pen = SelectObject(hdcmem, pen);
+  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
+  HGDIOBJ old_brush = SelectObject(hdcmem, brush);
+  return CDRF_NEWFONT;
+
+/*  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
+// HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)(((NMHDR*)lParam)->hwndFrom))->hdc);
+  HDC hdcmem=GetDC(hTest);
+  RECT temp;
+  temp.left=0;
+  temp.top=0;
+  temp.right=140;
+  temp.bottom=25;
+  HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+  HGDIOBJ old_pen = SelectObject(hdcmem, pen);
+  HGDIOBJ old_brush = SelectObject(hdcmem, brush);
+  FillRect(hdcmem, &temp, brush);
+  SelectObject(hdcmem,old_pen);
+  SelectObject(hdcmem,old_brush);
+  return CDRF_DODEFAULT;
+*/
+  //return DefWindowProc(hwnd,msg,wParam,lParam);
+}
  break;
  case NM_CLICK:
   //printf("click %i %i\n",((NMITEMACTIVATE*)lParam)->iItem,((NMITEMACTIVATE*)lParam)->iSubItem);

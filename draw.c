@@ -59,7 +59,7 @@ struct point{
 struct point trajectory[256];
 int trajectoryLength=0;
 int currentPoint=-1;
-char doTrajectory=0;
+char doTrajectory=0,doStep=0;
 
 
 float A1offset=600;
@@ -178,28 +178,55 @@ void draw(){
 
   doCalc();
 
+  if(doStep){
+   char lbuf[36];
+   memset(lbuf,0,36);
+   memcpy(lbuf,&trajectory[currentPoint].type,4);
+   memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+   memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+   memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+   memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+   memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+   memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+   memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+   sernumsent=sernumstart+currentPoint;
+   memcpy(lbuf+32,&sernumsent,2);
+   sendPacket(lbuf);
+   printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+   currentPoint++;
+   if(currentPoint==trajectoryLength){
+    sernumstart=sernumback;
+    EnableWindow(hButtonRunTrajectory,1);
+    currentPoint=-1;
+   }
+   doStep=0;
+  }
+
   if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
    if(doTrajectory){
-    char lbuf[36];
-    memset(lbuf,0,36);
-    memcpy(lbuf,&trajectory[currentPoint].type,4);
-    memcpy(lbuf+4,&trajectory[currentPoint].x,4);
-    memcpy(lbuf+8,&trajectory[currentPoint].y,4);
-    memcpy(lbuf+12,&trajectory[currentPoint].c,4);
-    memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
-    memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
-    memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
-    memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
-    sernumsent=sernumstart+currentPoint;
-    memcpy(lbuf+32,&sernumsent,2);
-    sendPacket(lbuf);
-    printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
-    currentPoint++;
-    if(currentPoint==trajectoryLength){
+    if(sernumback-sernumstart+1==trajectoryLength || currentPoint==trajectoryLength){
+printf("current point %i\n",currentPoint);
+     SetWindowText(hButtonRunTrajectory,"Run");
      sernumstart=sernumback;
      EnableWindow(hButtonRunTrajectory,1);
      currentPoint=-1;
      doTrajectory=0;
+    }else{
+     char lbuf[36];
+     memset(lbuf,0,36);
+     memcpy(lbuf,&trajectory[currentPoint].type,4);
+     memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+     memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+     memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+     memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+     memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+     memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+     sernumsent=sernumstart+currentPoint;
+     memcpy(lbuf+32,&sernumsent,2);
+     sendPacket(lbuf);
+     printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+     currentPoint++;
     }
    }
   }
@@ -243,8 +270,8 @@ void draw(){
    oldAxis3=Axis3;
   }
   zoom*=zoom_d;
-  tx+=tx_d*300;
-  ty+=ty_d*300;
+  tx+=tx_d*2000*sqrt(zoom);
+  ty+=ty_d*2000*sqrt(zoom);
 //  glOrtho(-w/2*zoom,w/2*zoom,-h/2*zoom,h/2*zoom,-10000*zoom,10000*zoom);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -295,12 +322,12 @@ trajc[curpt][1]=yc;
     glVertex3f(-20000+1000*i,20000,0);
   }
   glColor3f(0.1,0.1,0.3);
-  if(zoom<0.1){
-   for(int i=0;i<40001;i++){
-    glVertex3f(-20000,-20000+1*i,0);
-    glVertex3f(20000,-20000+1*i,0);
-    glVertex3f(-20000+1*i,-20000,0);
-    glVertex3f(-20000+1*i,20000,0);
+  if(zoom<0.01){
+   for(int i=0;i<1001;i++){
+    glVertex3f(tx-500,ty-500+1*i,0);
+    glVertex3f(tx+500,ty-500+1*i,0);
+    glVertex3f(tx-500+1*i,ty-500,0);
+    glVertex3f(tx-500+1*i,ty+500,0);
    }
   }
   glEnd();

@@ -20,8 +20,8 @@ HWND hButtonOpen;
 HWND hButtonStartServer,hStatus;
 HWND hButtonErase;
 HWND hButtonRunTrajectory;
-HWND hButtonPauseTrajectory;
-HWND hButtonStopTrajectory;
+HWND hButtonResetTrajectory;
+HWND hButtonStepTrajectory;
 
 //Конструкционные параметры (отступы креплений швп, и их рычаги)
 HWND hA1OffsetLabel,hA2OffsetLabel;
@@ -39,7 +39,7 @@ HWND hXactual,hYactual,hZactual,hVelactual;
 HWND hA1,hA2,hA3,hA4,hA5;
 HWND hAxesLabel;
 
-HWND hCopyLinButton,hCopyCircButton;
+HWND hCopyLinButton,hCopyCircButton,hCopyCircAuxButton;
 
 HWND hResetErrorButton;
 
@@ -258,7 +258,8 @@ printf("Codepage:%u\n",GetACP());
 
  
  hCopyCircButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,430,h,20,25,hwnd,0,0,0);
- hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,450,h,75,25,hwnd,0,0,0);
+ hCopyCircAuxButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,450,h,20,25,hwnd,0,0,0);
+ hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,470,h,55,25,hwnd,0,0,0);
  hXCircEndLabel=CreateWindow("STATIC","end X:",WS_CHILD|WS_VISIBLE,430,h+25,45,25,hwnd,0,0,0);
  hYCircEndLabel=CreateWindow("STATIC","end Y:",WS_CHILD|WS_VISIBLE,430,h+50,45,25,hwnd,0,0,0);
  hCCircEndLabel=CreateWindow("STATIC","end C:",WS_CHILD|WS_VISIBLE,430,h+75,45,25,hwnd,0,0,0);
@@ -334,10 +335,11 @@ printf("Codepage:%u\n",GetACP());
 
  hButtonOpen = CreateWindowA("BUTTON","Open points' file",WS_CHILD|WS_VISIBLE,650,h,140,25,hwnd,0,0,0);
  hButtonRunTrajectory=CreateWindowA("BUTTON","Run",WS_CHILD|WS_VISIBLE,650,h+25,45,25,hwnd,0,0,0);
- hButtonPauseTrajectory=CreateWindowA("BUTTON","Pause",WS_CHILD|WS_VISIBLE,695,h+25,50,25,hwnd,0,0,0);
- hButtonStopTrajectory=CreateWindowA("BUTTON","Stop",WS_CHILD|WS_VISIBLE,745,h+25,45,25,hwnd,0,0,0);
- EnableWindow(hButtonPauseTrajectory,0);
- EnableWindow(hButtonStopTrajectory,0);
+ hButtonResetTrajectory=CreateWindowA("BUTTON","Reset",WS_CHILD|WS_VISIBLE,695,h+25,50,25,hwnd,0,0,0);
+ hButtonStepTrajectory=CreateWindowA("BUTTON","Step",WS_CHILD|WS_VISIBLE,745,h+25,45,25,hwnd,0,0,0);
+ EnableWindow(hButtonRunTrajectory,0);
+ EnableWindow(hButtonResetTrajectory,0);
+ EnableWindow(hButtonStepTrajectory,0);
  HWND hLabel1=CreateWindow("STATIC","Trajectory",WS_CHILD|WS_VISIBLE,w+10,0,320,30,hwnd,0,0,0);
  hTest= CreateWindowA(WC_LISTVIEW,"",WS_CHILD|WS_VISIBLE|LVS_REPORT,w+10,30,320,h-30,hwnd,0,0,0);
  origTestProc=(WNDPROC)SetWindowLongPtr(hTest,GWLP_WNDPROC,(LONG_PTR)&WinProcLV);

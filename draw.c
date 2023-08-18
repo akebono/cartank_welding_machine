@@ -59,7 +59,7 @@ struct point{
 struct point trajectory[256];
 int trajectoryLength=0;
 int currentPoint=-1;
-char doTrajectory=0,doStep=0,trajectoryDone=0;
+char doTrajectory=0,trajectoryDone=0;
 
 
 float A1offset=600;
@@ -70,7 +70,7 @@ float A2lever=853;
 
 float Arm1=2000;
 float Arm2=2000;
-
+//float toolpos[3]={};
 float L1=830,L2=1030;
 float A1motor,A2motor;
 
@@ -178,29 +178,6 @@ void draw(){
 
   doCalc();
 
-  if(doStep){
-   char lbuf[36];
-   memset(lbuf,0,36);
-   memcpy(lbuf,&trajectory[currentPoint].type,4);
-   memcpy(lbuf+4,&trajectory[currentPoint].x,4);
-   memcpy(lbuf+8,&trajectory[currentPoint].y,4);
-   memcpy(lbuf+12,&trajectory[currentPoint].c,4);
-   memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
-   memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
-   memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
-   memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
-   sernumsent=sernumstart+currentPoint;
-   memcpy(lbuf+32,&sernumsent,2);
-   sendPacket(lbuf);
-   printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
-   currentPoint++;
-   if(currentPoint==trajectoryLength){
-    sernumstart=sernumback;
-    EnableWindow(hButtonRunTrajectory,1);
-    currentPoint=-1;
-   }
-   doStep=0;
-  }
   if(!trajectoryDone){
    if(sernumback-sernumstart+1==trajectoryLength){
     SetWindowText(hButtonRunTrajectory,"Run");
@@ -211,12 +188,13 @@ void draw(){
   }
   if(doTrajectory){
    if(currentPoint==trajectoryLength){
-//printf("end of trajectory length:%i\n",currentPoint);
     doTrajectory=0;
     currentPoint=-1;
+    SetWindowText(hButtonRunTrajectory,"Run");
+    EnableWindow(hButtonStepTrajectory,1);
+    EnableWindow(hButtonOpen,1);
    }else{
     if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
-     printf("sending packet:%i\n",sernumsent);
      char lbuf[36];
      memset(lbuf,0,36);
      memcpy(lbuf,&trajectory[currentPoint].type,4);

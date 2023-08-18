@@ -144,12 +144,12 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
        char lbuf[36];
        memset(lbuf,0,36);
+       lbuf[0]=1;
        memcpy(lbuf+4,&lx,4);
        memcpy(lbuf+8,&ly,4);
        memcpy(lbuf+12,&lc,4);
        memcpy(lbuf+16,&lvel,4);
        memcpy(lbuf+32,&sernumstart,4);
-       lbuf[0]=0;
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
        if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
@@ -222,7 +222,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
 //       inCirc=1;
 
        memset(lbuf,0,36);
-       lbuf[0]=1;
+       lbuf[0]=2;
        memcpy(lbuf+4,&xe,4);
        memcpy(lbuf+8,&ye,4);
        memcpy(lbuf+12,&ce,4);
@@ -237,7 +237,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
 
       if(lParam==(LPARAM)hResetErrorButton){
        memset(lbuf,0,36);
-       lbuf[0]=2;
+       lbuf[0]=4;
        if(sendto(s,lbuf,36,0,&rsa,16)==-1)
          printf("send failed\n");
       }
@@ -298,9 +298,9 @@ trajectory[pnum].vel=derVel;
 char derType=end[1];
 end=strchr(end+1,';');
 if(derType=='L')
- trajectory[pnum].type=0;
-else if(derType=='C')
  trajectory[pnum].type=1;
+else if(derType=='C')
+ trajectory[pnum].type=2;
 else
  printf("derType=%c\n",derType);
 float derX=atof(end+1);
@@ -379,27 +379,60 @@ printf("trajectory length:%i\n",trajectoryLength);
         }
       }
       if(lParam==(LPARAM)hButtonRunTrajectory){
+printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
         if(doTrajectory==1){
          doTrajectory=0;
-         SetWindowText(hButtonRunTrajectory,"Run");
+         SetWindowText(hButtonRunTrajectory,"Cont.");
          EnableWindow(hButtonStepTrajectory,1);
-         EnableWindow(hButtonOpen,0);
-        }
-        else if(currentPoint==-1){
-         trajectoryDone=0;
-         currentPoint=0;
-         doTrajectory=1;
-         SetWindowText(hButtonRunTrajectory,"Pause");
-         EnableWindow(hButtonResetTrajectory,1);
-         EnableWindow(hButtonStepTrajectory,0);
          EnableWindow(hButtonOpen,1);
+         memset(lbuf,0,36);
+         lbuf[0]=8;
+         sernumsent=sernumstart+currentPoint;
+         memcpy(lbuf+32,&sernumsent,4);
+         if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+          printf("send failed\n");
+        }else{
+         if(currentPoint>-1){
+          memset(lbuf,0,36);
+          lbuf[0]=16;
+          sernumsent=sernumstart+currentPoint;
+          memcpy(lbuf+32,&sernumsent,4);
+          if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+           printf("send failed\n");
+          SetWindowText(hButtonRunTrajectory,"Pause");
+          doTrajectory=1;
+          EnableWindow(hButtonStepTrajectory,0);
+          EnableWindow(hButtonOpen,0);
+         }else{
+          trajectoryDone=0;
+          currentPoint=0;
+          sernumstart=sernumback;
+          doTrajectory=1;
+          SetWindowText(hButtonRunTrajectory,"Pause");
+          EnableWindow(hButtonResetTrajectory,1);
+          EnableWindow(hButtonStepTrajectory,0);
+          EnableWindow(hButtonOpen,0);
+         }
         }
+        printf("after. doTrajectory=%i currentPoint=%i sernumback=%i sernumsent=%i\n",doTrajectory,currentPoint,sernumback,sernumsent);
       }
 
       if(lParam==(LPARAM)hButtonStepTrajectory){
-       doStep=1;
-       doTrajectory=0;
-       EnableWindow(hButtonResetTrajectory,1);
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf,&trajectory[currentPoint].type,4);
+       memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+       memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+       memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+       memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+       memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+       memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+       memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+       sernumsent=sernumstart+currentPoint;
+       memcpy(lbuf+32,&sernumsent,2);
+       sendPacket(lbuf);
+       printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+       currentPoint++;
       }
 
       if(lParam==(LPARAM)hButtonResetTrajectory){
@@ -411,6 +444,10 @@ printf("trajectory length:%i\n",trajectoryLength);
        EnableWindow(hButtonRunTrajectory,1);
        EnableWindow(hButtonResetTrajectory,0);
        EnableWindow(hButtonStepTrajectory,1);
+       memset(lbuf,0,36);
+       lbuf[0]=32;
+       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+        printf("send failed\n");
       }
 
       if(lParam==(LPARAM)hXPlusButton){
@@ -420,6 +457,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        float vel=atof(lbuf);
 
        unsigned char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
@@ -435,6 +473,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
        char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
@@ -451,6 +490,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        float vel=atof(lbuf);
 
        char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&newy,4);
@@ -468,6 +508,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        float vel=atof(lbuf);
 
        char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&newy,4);
@@ -484,6 +525,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        float vel=atof(lbuf);
 
        char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&y,4);
@@ -500,6 +542,7 @@ printf("trajectory length:%i\n",trajectoryLength);
        float vel=atof(lbuf);
 
        char lbuf[36];
+       lbuf[0]=1;
        memset(lbuf,0,36);
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&y,4);
@@ -641,7 +684,7 @@ printf("trajectory length:%i\n",trajectoryLength);
       if(lParam==(LPARAM)hSendTestWordButton){
        char lbuf[36];
        memset(lbuf,0,36);
-       lbuf[0]=3;
+       lbuf[0]=64;
        memcpy(lbuf+4,&testword,2);
 
        sendPacket(lbuf);

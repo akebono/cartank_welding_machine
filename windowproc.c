@@ -285,50 +285,53 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
             sprintf(li.pszText,"%.3f\n",derCurrent);
             li.iSubItem=1;
             SendMessage(hTest,LVM_SETITEM,0,(LPARAM)&li);
+
             end=strchr(end+1,';');
             float derPressure=atof(end+1);
             sprintf(li.pszText,"%.3f\n",derPressure);
             li.iSubItem=2;
             SendMessage(hTest,LVM_SETITEM,0,(LPARAM)&li);
+
             end=strchr(end+1,';');
+            float derVel=atof(end+1);
+            trajectory[pnum].vel=derVel;
 
-float derVel=atof(end+1);
-end=strchr(end+1,';');
-trajectory[pnum].vel=derVel;
-char derType=end[1];
-end=strchr(end+1,';');
-if(derType=='L')
- trajectory[pnum].type=1;
-else if(derType=='C')
- trajectory[pnum].type=2;
-else
- printf("derType=%c\n",derType);
-float derX=atof(end+1);
-end=strchr(end+1,';');
-trajectory[pnum].x=derX;
+            end=strchr(end+1,';');
+            char derType=end[1];
+            if(derType=='L')
+             trajectory[pnum].type=1;
+            else if(derType=='C')
+             trajectory[pnum].type=2;
+            else
+             printf("derType=%c\n",derType);
 
-float derY=atof(end+1);
-end=strchr(end+1,';');
-trajectory[pnum].y=derY;
+            end=strchr(end+1,';');
+            float derX=atof(end+1);
+            trajectory[pnum].x=derX;
 
-float derC=atof(end+1);
-end=strchr(end+1,';');
-trajectory[pnum].c=derC;
+            end=strchr(end+1,';');
+            float derY=atof(end+1);
+            trajectory[pnum].y=derY;
 
-if(derType=='C'){
- float derXaux=atof(end+1);
- end=strchr(end+1,';');
- trajectory[pnum].xa=derXaux;
+            end=strchr(end+1,';');
+            float derC=atof(end+1);
+            trajectory[pnum].c=derC;
 
- float derYaux=atof(end+1);
- end=strchr(end+1,';');
- trajectory[pnum].ya=derYaux;
+            if(derType=='C'){
+             end=strchr(end+1,';');
+             float derXaux=atof(end+1);
+             trajectory[pnum].xa=derXaux;
 
- float derCaux=atof(end+1);
- end=strchr(end+1,';');
- trajectory[pnum].ca=derCaux;
-}           
+             end=strchr(end+1,';');
+             float derYaux=atof(end+1);
+             trajectory[pnum].ya=derYaux;
 
+             end=strchr(end+1,';');
+             float derCaux=atof(end+1);
+             trajectory[pnum].ca=derCaux;
+            }           
+
+            end=strchr(end+1,';');
             li.iItem++;
             if(offset==(char*)1)
               break;

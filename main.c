@@ -149,6 +149,9 @@ DWORD WINAPI thread(void*param){
     doCalc();
 
 /*for drawing graphic*/
+if(x==0 || y==0){
+printf("BOGUS? L1=%.3f L2=%.3f Axis3=%.3f\n",L1,L2,Axis3);
+}
     traj[curpt][0]=x;
     traj[curpt][1]=y;
     curpt++;

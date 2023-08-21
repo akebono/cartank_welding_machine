@@ -335,7 +335,18 @@ if(derType=='C'){
             pnum++;
           }while(offset<fbuf+st.st_size);
           trajectoryLength=pnum;
-printf("trajectory length:%i\n",trajectoryLength);
+          doTrajectory=0;
+          trajectoryDone=0;
+          currentPoint=-1;
+          SetWindowText(hButtonRunTrajectory,"Run");
+          sernumstart=sernumback;
+          EnableWindow(hButtonRunTrajectory,1);
+          EnableWindow(hButtonResetTrajectory,0);
+          EnableWindow(hButtonStepTrajectory,1);
+          memset(lbuf,0,36);
+          lbuf[0]=32;
+          if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+           printf("send failed\n");
           SendMessage(hTest,WM_PAINT,0,0);
           if(pnum>0){
            EnableWindow(hButtonRunTrajectory,1);

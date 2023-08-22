@@ -21,7 +21,8 @@ HWND hButtonStartServer,hStatus;
 HWND hButtonErase;
 HWND hButtonRunTrajectory;
 HWND hButtonResetTrajectory;
-HWND hButtonStepTrajectory;
+HWND hRadioStepTrajectory;
+HWND hRadioContTrajectory;
 
 //Конструкционные параметры (отступы креплений швп, и их рычаги)
 HWND hA1OffsetLabel,hA2OffsetLabel;
@@ -339,10 +340,15 @@ printf("Codepage:%u\n",GetACP());
  hButtonOpen = CreateWindowA("BUTTON","Open points' file",WS_CHILD|WS_VISIBLE,650,h,140,25,hwnd,0,0,0);
  hButtonRunTrajectory=CreateWindowA("BUTTON","Run",WS_CHILD|WS_VISIBLE,650,h+25,45,25,hwnd,0,0,0);
  hButtonResetTrajectory=CreateWindowA("BUTTON","Reset",WS_CHILD|WS_VISIBLE,695,h+25,50,25,hwnd,0,0,0);
- hButtonStepTrajectory=CreateWindowA("BUTTON","Step",WS_CHILD|WS_VISIBLE,745,h+25,45,25,hwnd,0,0,0);
+ hRadioStepTrajectory=CreateWindowA("BUTTON","Step",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,800,h+100,60,25,hwnd,0,0,0);
+ hRadioContTrajectory=CreateWindowA("BUTTON","Cont",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,800,h+125,60,25,hwnd,0,0,0);
+
+
  EnableWindow(hButtonRunTrajectory,0);
  EnableWindow(hButtonResetTrajectory,0);
- EnableWindow(hButtonStepTrajectory,0);
+ EnableWindow(hRadioStepTrajectory,0);
+
+ SendMessage(hRadioContTrajectory,BM_SETCHECK,BST_CHECKED,0);
  HWND hLabel1=CreateWindow("STATIC","Trajectory",WS_CHILD|WS_VISIBLE,w+10,0,320,30,hwnd,0,0,0);
  hTest= CreateWindowA(WC_LISTVIEW,"",WS_CHILD|WS_VISIBLE|LVS_REPORT,w+10,30,320,h-30,hwnd,0,0,0);
  origTestProc=(WNDPROC)SetWindowLongPtr(hTest,GWLP_WNDPROC,(LONG_PTR)&WinProcLV);

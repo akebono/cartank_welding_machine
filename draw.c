@@ -191,7 +191,7 @@ void draw(){
     doTrajectory=0;
     currentPoint=-1;
     SetWindowText(hButtonRunTrajectory,"Run");
-    EnableWindow(hButtonStepTrajectory,1);
+    EnableWindow(hRadioStepTrajectory,1);
     EnableWindow(hButtonOpen,1);
    }else{
     if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){

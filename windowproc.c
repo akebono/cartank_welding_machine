@@ -142,6 +142,9 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
 //       task=1;
 
+       EnableWindow(hButtonResetTrajectory,0);
+       EnableWindow(hButtonRunTrajectory,0);
+
        char lbuf[36];
        memset(lbuf,0,36);
        lbuf[0]=1;
@@ -205,7 +208,7 @@ printf("%.1f %.1f %.1f %.1f\n",lA,lB,lC,lD);
        cy=(lD-lB*lC)/(1-lA*lC);
        cx=lB-lA*cy;
        cr=sqrt((xs-cx)*(xs-cx)+(ys-cy)*(ys-cy));
-cphi=atan((y-cy)/(x-cx))*180/pi;
+       cphi=atan((y-cy)/(x-cx))*180/pi;
        cd=atan((ye-cy)/(xe-cx))*180/pi;
 printf("cphi=%.1f cd=%.1f\n",cphi,cd);
        t0=0;
@@ -220,6 +223,9 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        a3e=cd-cphi+Axis3;
 //Axis3=a3e;
 //       inCirc=1;
+       EnableWindow(hButtonResetTrajectory,0);
+       EnableWindow(hButtonRunTrajectory,0);
+
 
        memset(lbuf,0,36);
        lbuf[0]=2;
@@ -345,7 +351,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
           sernumstart=sernumback;
           EnableWindow(hButtonRunTrajectory,1);
           EnableWindow(hButtonResetTrajectory,0);
-          EnableWindow(hButtonStepTrajectory,1);
+          EnableWindow(hRadioStepTrajectory,1);
           memset(lbuf,0,36);
           lbuf[0]=32;
           if(sendto(s,lbuf,36,0,&rsa,16)==-1)
@@ -353,7 +359,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
           SendMessage(hTest,WM_PAINT,0,0);
           if(pnum>0){
            EnableWindow(hButtonRunTrajectory,1);
-           EnableWindow(hButtonStepTrajectory,1);
+           EnableWindow(hRadioStepTrajectory,1);
           }
           offset=fbuf;
 
@@ -397,7 +403,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
         if(doTrajectory==1){
          doTrajectory=0;
          SetWindowText(hButtonRunTrajectory,"Cont.");
-         EnableWindow(hButtonStepTrajectory,1);
+         EnableWindow(hRadioStepTrajectory,1);
          EnableWindow(hButtonOpen,1);
          memset(lbuf,0,36);
          lbuf[0]=8;
@@ -415,7 +421,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
            printf("send failed\n");
           SetWindowText(hButtonRunTrajectory,"Pause");
           doTrajectory=1;
-          EnableWindow(hButtonStepTrajectory,0);
+          EnableWindow(hRadioStepTrajectory,0);
           EnableWindow(hButtonOpen,0);
          }else{
           trajectoryDone=0;
@@ -424,14 +430,14 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
           doTrajectory=1;
           SetWindowText(hButtonRunTrajectory,"Pause");
           EnableWindow(hButtonResetTrajectory,1);
-          EnableWindow(hButtonStepTrajectory,0);
+          EnableWindow(hRadioStepTrajectory,0);
           EnableWindow(hButtonOpen,0);
          }
         }
         printf("after. doTrajectory=%i currentPoint=%i sernumback=%i sernumsent=%i\n",doTrajectory,currentPoint,sernumback,sernumsent);
       }
 
-      if(lParam==(LPARAM)hButtonStepTrajectory){
+      if(lParam==(LPARAM)hRadioStepTrajectory){
        char lbuf[36];
        memset(lbuf,0,36);
        memcpy(lbuf,&trajectory[currentPoint].type,4);
@@ -457,7 +463,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        sernumstart=sernumback;
        EnableWindow(hButtonRunTrajectory,1);
        EnableWindow(hButtonResetTrajectory,0);
-       EnableWindow(hButtonStepTrajectory,1);
+       EnableWindow(hRadioStepTrajectory,1);
        memset(lbuf,0,36);
        lbuf[0]=32;
        if(sendto(s,lbuf,36,0,&rsa,16)==-1)

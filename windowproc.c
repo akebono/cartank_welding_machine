@@ -846,10 +846,16 @@ printf("%llX\n",wParam);
     }
   break;
   case WM_MOUSEWHEEL:
-    if((int)wParam>0)
-      zoom/=1.4142;
-    else
-      zoom*=1.4142;
+    float m[16]={1.4142,0,0,0,0,1.4142,0,0,0,0,1.4142,0,0,0,0,1};
+    float d[16]={1/1.4142,0,0,0,0,1/1.4142,0,0,0,0,1/1.4142,0,0,0,0,1};
+   if((int)wParam>0){
+
+//    glMultMatrixf(d);
+    zoom/=1.4142;
+   }else{
+    zoom*=1.4142;
+//    glMultMatrixf(m);
+   }
   break;
 
   case WM_LBUTTONDOWN:

@@ -259,6 +259,9 @@ void draw(){
   glLoadIdentity();
   glOrtho(-w*40*zoom,w*40*zoom,-h*40*zoom,h*40*zoom,-100000,100000);
 */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
   if(GetFocus()==opengl){
    glDisable(GL_LIGHTING);
    glColor3f(1,0,0);
@@ -270,14 +273,18 @@ void draw(){
    glEnd();
 
   }
-traj[curpt][0]=x;
-traj[curpt][1]=y;
-trajc[curpt][0]=xc;
-trajc[curpt][1]=yc;
+
+
+  glOrtho(-w*40*zoom,w*40*zoom,-h*40*zoom,h*40*zoom,-100000,100000);
 /*
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 */
+traj[curpt][0]=x;
+traj[curpt][1]=y;
+trajc[curpt][0]=xc;
+trajc[curpt][1]=yc;
+
 
   glPushMatrix();
   glTranslatef(-tx,-ty,tz);
@@ -709,11 +716,6 @@ void init_opengl(){
   glGetIntegerv(GL_VIEWPORT,viewport);
 printf("%i %i %i %i\n",viewport[0],viewport[1],viewport[2],viewport[3]);
 */
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(-w*40,w*40,-h*40,h*40,-10000,10000);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
   glEnable(GL_LIGHT1);

@@ -10,16 +10,16 @@ LRESULT CALLBACK WinProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
         printf("failed to describe pixel format\n");
 
        SetPixelFormat(hDC,iPixelFormat,&pfd);
+       hRC = wglCreateContext( hDC );
 
-      hRC = wglCreateContext( hDC );
-
-      wglMakeCurrent(hDC, hRC);
-
+       wglMakeCurrent(hDC, hRC);
+       wglUseFontBitmaps (hDC, 0, 255, 1000);
+glListBase (1000); 
       init_opengl();
 
     break;
     case WM_PAINT:
-      //glClearColor(0,0,0,0);
+
 /*
  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
 // HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)hIncLabel)->hdc);
@@ -31,14 +31,6 @@ HDC hdcmem=GetDC(hIncLabel);
  temp.bottom=25;
  FillRect(hdcmem, &temp, brush);
 */
-      if(status&0x80000000)
-       glClearColor(1,0,0,1);
-      else
-       glClearColor(0,0,0,1);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      draw();
-      glFinish();
-      SwapBuffers(hDC);
     break;
     case WM_RBUTTONDOWN:
       dragstart[0]=LOWORD(lParam)-rot[0];
@@ -53,12 +45,6 @@ HDC hdcmem=GetDC(hIncLabel);
         rot[0]=LOWORD(lParam)-dragstart[0];
         rot[1]=HIWORD(lParam)-dragstart[1];
       }
-    break;
-    case WM_MOUSEWHEEL:
-      if((int)wParam>0)
-        zoom/=1.4142;
-      else
-        zoom*=1.4142;
     break;
     case WM_DESTROY:
       PostQuitMessage(0);
@@ -751,7 +737,6 @@ LRESULT CALLBACK WinProcEdit(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
  switch(msg){
    case WM_PAINT:
-     //glClearColor(0,0,0,0);
      if(status&0x80000000)
       glClearColor(1,0,0,1);
      else
@@ -860,8 +845,19 @@ printf("%llX\n",wParam);
     break;
     }
   break;
+  case WM_MOUSEWHEEL:
+    if((int)wParam>0)
+      zoom/=1.4142;
+    else
+      zoom*=1.4142;
+  break;
+
   case WM_LBUTTONDOWN:
-    SetFocus(opengl);
+   //glPushMatrix();
+   //glMatrixMode(GL_PROJECTION);
+   gluPickMatrix(LOWORD(lParam),HIWORD(lParam),1,1,viewport);
+   //glPopMatrix();
+   SetFocus(opengl);
   break;
   default:
 //    printf("[opengl window]msg %08X\n",msg);

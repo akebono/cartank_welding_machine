@@ -103,12 +103,10 @@ void doCalc(){
   yc=Arm2*sin(Axis2*pi/180+Axis1*pi/180)+Arm1*sin(Axis1*pi/180);
   y=yc;
   c=Axis1+Axis2+Axis3;
-//  y=yc-tank_edge;
 }
 
 
 void doInverse(){
-// float ly=y+tank_edge;
  float ly=y;
  float lAxis1=atan(ly/x)+acos((Arm1*Arm1+x*x+ly*ly-Arm2*Arm2)/(2*Arm1*sqrt(x*x+ly*ly)));
 
@@ -121,7 +119,7 @@ Axis1=lAxis1;
 Axis2=lAxis2;
  L1=sqrt(A1offset*A1offset+A1lever*A1lever-2*A1offset*A1lever*cos((180-lAxis1)*pi/180));
  L2=sqrt(A2offset*A2offset+A2lever*A2lever-2*A2offset*A2lever*cos((90-lAxis2-lAxis1)*pi/180));
- curpt++;
+// curpt++;
 }
 void doLine(){
 
@@ -256,8 +254,11 @@ void draw(){
   tx+=tx_d*2000*sqrt(zoom);
   ty+=ty_d*2000*sqrt(zoom);
 //  glOrtho(-w/2*zoom,w/2*zoom,-h/2*zoom,h/2*zoom,-10000*zoom,10000*zoom);
+/*
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
+  glOrtho(-w*40*zoom,w*40*zoom,-h*40*zoom,h*40*zoom,-100000,100000);
+*/
   if(GetFocus()==opengl){
    glDisable(GL_LIGHTING);
    glColor3f(1,0,0);
@@ -273,7 +274,6 @@ traj[curpt][0]=x;
 traj[curpt][1]=y;
 trajc[curpt][0]=xc;
 trajc[curpt][1]=yc;
-  glOrtho(-w*40*zoom,w*40*zoom,-h*40*zoom,h*40*zoom,-100000,100000);
 /*
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -702,6 +702,8 @@ int load_model(char *modelname){
 }
 int viewport[4];
 void init_opengl(){
+
+
   glEnable(GL_DEPTH_TEST);
 /*
   glGetIntegerv(GL_VIEWPORT,viewport);
@@ -709,7 +711,7 @@ printf("%i %i %i %i\n",viewport[0],viewport[1],viewport[2],viewport[3]);
 */
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(-w,w,-h,h,-10000,10000);
+  glOrtho(-w*40,w*40,-h*40,h*40,-10000,10000);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glEnable(GL_LIGHTING);

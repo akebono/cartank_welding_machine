@@ -4,6 +4,10 @@
 #include <gl/gl.h>
 
 int w=600,h=500;
+HDC hDC;
+HGLRC hRC;
+int iPixelFormat;
+
 WNDPROC origTestProc,editProc,openglProc;
 WNDPROC origExecMove;
 
@@ -78,16 +82,13 @@ PIXELFORMATDESCRIPTOR pfd = { 0x28,   // size of this pfd
 	0, 0, 0                // layer masks ignored
 };
 
-HDC hDC;
-HGLRC hRC;
-int iPixelFormat;
 
  LVITEM li;
  //LPSTR_TEXTCALLBACK;
-
+/*
 float *pointsIn,*pointsOut;
 int pointNum=0;
-
+*/
 #include "windowproc.c"
 
 DWORD WINAPI thread(void*param){

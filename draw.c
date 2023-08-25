@@ -6,8 +6,9 @@
 
 #define POINTS 10000000
 
-int dragstart[2],drag=0,dragt=0,rott=0,dragtstart;
+int dragstart[2],drag=0,strafedrag=0,dragt=0,rott=0,dragtstart;
 float rot[2]={0,0};
+float trans[2]={0,0};
 float zoom=0.25;
 float zoom_d=1;
 float shift[3];
@@ -70,7 +71,7 @@ float A2lever=853;
 
 float Arm1=2000;
 float Arm2=2000;
-//float toolpos[3]={};
+float toolpos[3]={1800,1800,1000};
 float L1=830,L2=1030;
 float A1motor,A2motor;
 
@@ -89,6 +90,7 @@ float cr,cx,cy,cphi,cd;
 float oldx,oldy,oldc,oldv,oldAxis1,oldAxis2,oldAxis3,oldL1,oldL2;
 
 float rollerY=6179.4,rollerX=10100;
+
 //
 void doCalc(){
   Axis1=180-acos((A1lever*A1lever+A1offset*A1offset-L1*L1)/(2*A1lever*A1offset))*180/pi;
@@ -105,6 +107,20 @@ void doCalc(){
   c=Axis1+Axis2+Axis3;
 }
 
+void doCalc2(){
+ Axis1=180-acos((A1lever*A1lever+A1offset*A1offset-L1*L1)/(2*A1lever*A1offset))*180/pi;
+
+ A1motor=asin(A1lever*sin((180-Axis1)*pi/180)/L1)*180/pi; //направление штанги первой оси
+
+ Axis2=90-acos((A2lever*A2lever+A2offset*A2offset-L2*L2)/(2*A2lever*A2offset))*180/pi-Axis1;
+ A2motor=asin(A2lever*sin((90-Axis2-Axis1)*pi/180)/L2)*180/pi; //направление штанги второй оси
+
+ float g=sqrt(toolpos[0]*toolpos[0]+toolpos[1]*toolpos[1]);
+ float psi=atan(toolpos[1]/toolpos[0]);
+ x=g*cos((Axis1+Axis2+Axis3)*pi/180+psi)-Arm1*cos((Axis3+Axis2)*pi/180)-Arm2*cos(Axis3*pi/180);
+ y=g*sin((Axis1+Axis2+Axis3)*pi/180+psi)+Arm1*sin((Axis3+Axis2)*pi/180)+Arm2*sin(Axis3*pi/180);
+
+}
 
 void doInverse(){
  float ly=y;
@@ -175,6 +191,11 @@ void draw(){
   }
 
   doCalc();
+
+  if(((status&7==1) ||(status&0x38==8)) && !doTrajectory){//for when "Arc To" or "Lin To" done
+   EnableWindow(hButtonResetTrajectory,1);
+   EnableWindow(hButtonRunTrajectory,1);
+  }
 
   if(!trajectoryDone){
    if(sernumback-sernumstart+1==trajectoryLength){
@@ -253,12 +274,7 @@ void draw(){
   zoom*=zoom_d;
   tx+=tx_d*2000*sqrt(zoom);
   ty+=ty_d*2000*sqrt(zoom);
-//  glOrtho(-w/2*zoom,w/2*zoom,-h/2*zoom,h/2*zoom,-10000*zoom,10000*zoom);
-/*
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(-w*40*zoom,w*40*zoom,-h*40*zoom,h*40*zoom,-100000,100000);
-*/
+
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
@@ -287,9 +303,9 @@ trajc[curpt][1]=yc;
 
 
   glPushMatrix();
-  glTranslatef(-tx,-ty,tz);
   glRotatef(rot[1]/1.0,1,0,0);
   glRotatef(rot[0]/1.0,0,1,0);
+  glTranslatef(-tx+trans[0],-ty-trans[1],tz);
   glDisable(GL_LIGHTING);
 
   glColor3f(1,1,0);
@@ -563,7 +579,8 @@ trajc[curpt][1]=yc;
   glEnd();
 */
   j=6;
-
+  glPushMatrix();
+  glTranslatef(toolpos[0],toolpos[1],toolpos[2]);
   glBegin(GL_TRIANGLES);
   mat[0]=0.4;
   mat[1]=0.4;
@@ -577,7 +594,7 @@ trajc[curpt][1]=yc;
     glVertex3f(*(float*)(blobs[j]+40+i*50),*(float*)(blobs[j]+44+i*50),*(float*)(blobs[j]+48+i*50));
   }
   glEnd();
-
+  glPopMatrix();
   glTranslatef(0,0,600);
   glPushMatrix();
   glRotatef(Axis2+Axis1,0,0,1);
@@ -681,14 +698,11 @@ glEnable(GL_LIGHTING);
   mat[3]=1;
   glMaterialfv(GL_FRONT,GL_DIFFUSE,mat);
 
-
   glPopMatrix();
   glPopMatrix();
   glPopMatrix();
   glPopMatrix();
   glPopMatrix();
-
-
 }
 
 int load_model(char *modelname){

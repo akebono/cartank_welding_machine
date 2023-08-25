@@ -21,17 +21,17 @@ glListBase (1000);
     case WM_PAINT:
 
 /*
+
  HBRUSH brush=CreateSolidBrush(RGB(255,128,128));
-// HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)hIncLabel)->hdc);
-HDC hdcmem=GetDC(hIncLabel);
+// HDC hdcmem = CreateCompatibleDC(((LPNMCUSTOMDRAW)hwnd)->hdc);
+ HDC hdcmem=GetDC(hwnd);
  RECT temp;
  temp.left=0;
  temp.top=0;
- temp.right=140;
- temp.bottom=25;
+ temp.right=500;
+ temp.bottom=h+325;
  FillRect(hdcmem, &temp, brush);
-*/
-    break;
+*/    break;
     case WM_RBUTTONDOWN:
       dragstart[0]=LOWORD(lParam)-rot[0];
       dragstart[1]=HIWORD(lParam)-rot[1];
@@ -44,6 +44,10 @@ HDC hdcmem=GetDC(hIncLabel);
       if(drag){
         rot[0]=LOWORD(lParam)-dragstart[0];
         rot[1]=HIWORD(lParam)-dragstart[1];
+      }
+      if(strafedrag){
+        trans[0]=LOWORD(lParam)-dragstart[0];
+        trans[1]=HIWORD(lParam)-dragstart[1];
       }
     break;
     case WM_DESTROY:
@@ -424,6 +428,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
       }
 
       if(lParam==(LPARAM)hRadioStepTrajectory){
+/*
        char lbuf[36];
        memset(lbuf,0,36);
        memcpy(lbuf,&trajectory[currentPoint].type,4);
@@ -439,6 +444,9 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        sendPacket(lbuf);
        printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
        currentPoint++;
+*/
+       SendMessage(hRadioStepTrajectory,BM_SETCHECK,BST_CHECKED,0);
+       SendMessage(hRadioContTrajectory,BM_SETCHECK,BST_UNCHECKED,0);
       }
 
       if(lParam==(LPARAM)hButtonResetTrajectory){
@@ -746,9 +754,6 @@ LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
      glFinish();
      SwapBuffers(hDC);
    break;
-   case WM_SETFOCUS:
-    SetFocus(opengl);
-   break;
    case WM_KEYDOWN:
     switch(wParam){
     case 0x51:
@@ -812,7 +817,7 @@ printf("%llX\n",wParam);
     }
   break;
   case WM_KEYUP:
-    switch(wParam){
+   switch(wParam){
     case 0x51:
       dL1=0;
     break;
@@ -843,7 +848,7 @@ printf("%llX\n",wParam);
     case 0x6D: //+
       zoom_d=1;
     break;
-    }
+   }
   break;
   case WM_MOUSEWHEEL:
     float m[16]={1.4142,0,0,0,0,1.4142,0,0,0,0,1.4142,0,0,0,0,1};
@@ -861,9 +866,15 @@ printf("%llX\n",wParam);
   case WM_LBUTTONDOWN:
    //glPushMatrix();
    //glMatrixMode(GL_PROJECTION);
-   gluPickMatrix(LOWORD(lParam),HIWORD(lParam),1,1,viewport);
+//   gluPickMatrix(LOWORD(lParam),HIWORD(lParam),1,1,viewport);
    //glPopMatrix();
    SetFocus(opengl);
+   dragstart[0]=LOWORD(lParam)-trans[0];
+   dragstart[1]=HIWORD(lParam)-trans[1];
+   strafedrag=1;
+  break;
+  case WM_LBUTTONUP:
+    strafedrag=0;
   break;
   default:
 //    printf("[opengl window]msg %08X\n",msg);

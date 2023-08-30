@@ -303,9 +303,9 @@ trajc[curpt][1]=yc;
 
 
   glPushMatrix();
+  glTranslatef(-tx+40*trans[0]*zoom,-ty-40*trans[1]*zoom,tz);
   glRotatef(rot[1]/1.0,1,0,0);
   glRotatef(rot[0]/1.0,0,1,0);
-  glTranslatef(-tx+trans[0],-ty-trans[1],tz);
   glDisable(GL_LIGHTING);
 
   glColor3f(1,1,0);
@@ -337,7 +337,7 @@ trajc[curpt][1]=yc;
    }
   }
   glEnd();
-  glColor3f(1,0,0);
+  glColor3f(1,1,1);
   glEnable(GL_LIGHTING);
 
   lipos[0]=3000;

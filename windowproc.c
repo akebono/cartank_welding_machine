@@ -604,102 +604,135 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&1) SendMessage(hBit00,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit00,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit01){
        testword^=2;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&2) SendMessage(hBit01,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit01,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit02){
        testword^=4;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&4) SendMessage(hBit02,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit02,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit03){
        testword^=8;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&8) SendMessage(hBit03,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit03,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit04){
        testword^=16;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x10) SendMessage(hBit04,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit04,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit05){
        testword^=32;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x20) SendMessage(hBit05,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit05,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit06){
        testword^=64;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x40) SendMessage(hBit06,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit06,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit07){
        testword^=128;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x80) SendMessage(hBit07,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit07,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit08){
        testword^=256;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x100) SendMessage(hBit08,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit08,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit09){
        testword^=512;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x200) SendMessage(hBit09,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit09,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit10){
        testword^=1024;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x400) SendMessage(hBit10,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit10,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit11){
        testword^=2048;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x800) SendMessage(hBit11,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit11,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit12){
        testword^=4096;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x1000) SendMessage(hBit12,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit12,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit13){
        testword^=8192;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x2000) SendMessage(hBit13,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit13,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit14){
        testword^=16384;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x4000) SendMessage(hBit14,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit14,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hBit15){
        testword^=32768;
        sprintf(lbuf,"%04X",testword);
        SetWindowText(hSendTestWordInput,lbuf);
        SendMessage(hSendTestWordInput,WM_PAINT,0,0);
+       if(testword&0x8000) SendMessage(hBit15,BM_SETCHECK,BST_CHECKED,0);
+       else SendMessage(hBit15,BM_SETCHECK,BST_UNCHECKED,0);
       }
       if(lParam==(LPARAM)hSendTestWordButton){
-       char lbuf[36];
-       memset(lbuf,0,36);
+       char lbuf[40];
+       memset(lbuf,0,40);
        lbuf[0]=64;
-       memcpy(lbuf+4,&testword,2);
+
+       memcpy(lbuf+36,&testword,2);
 
        sendPacket(lbuf);
       }

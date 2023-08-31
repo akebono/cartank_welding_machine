@@ -71,7 +71,7 @@ float A2lever=853;
 
 float Arm1=2000;
 float Arm2=2000;
-float toolpos[3]={1800,1800,1000};
+float toolpos[3]={1930.2,1773.9,1000};
 float L1=830,L2=1030;
 float A1motor,A2motor;
 
@@ -303,7 +303,7 @@ trajc[curpt][1]=yc;
 
 
   glPushMatrix();
-  glTranslatef(-tx+40*trans[0]*zoom,-ty-40*trans[1]*zoom,tz);
+  glTranslatef(-tx+80*trans[0]*zoom,-ty-80*trans[1]*zoom,tz);
   glRotatef(rot[1]/1.0,1,0,0);
   glRotatef(rot[0]/1.0,0,1,0);
   glDisable(GL_LIGHTING);

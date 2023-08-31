@@ -166,7 +166,7 @@ printf("BOGUS? L1=%.3f L2=%.3f Axis3=%.3f\n",L1,L2,Axis3);
 }
 
 void sendPacket(unsigned char *lbuf){
- if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+ if(sendto(s,lbuf,40,0,&rsa,16)==-1)
   printf("send failed\n");
 }
 
@@ -232,7 +232,7 @@ printf("Codepage:%u\n",GetACP());
 
  hPointVel=CreateWindow("EDIT",0,WS_CHILD|WS_VISIBLE|ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL/*|ES_NUMBER*/,1120,40, 100,500,hwnd,0,0,0);
 // editProc=(WNDPROC)SetWindowLongPtr(hPointVel,GWLP_WNDPROC,(LONG_PTR)&WinProcEdit);
- hHelpLabel=CreateWindow("STATIC","Control:\r\nAxis 1 +/- : Q/A\r\nAxis 2 +/- : W/S\r\nAxis 3 +/- : E/D\r\nNumpad \"+\" - zoom in\r\nNumpad \"-\" - zoom out\r\nRight mouse button - rotate\r\nNumpad \"7\" - Top view\r\nNumpad \".\" - reset view",WS_CHILD|WS_VISIBLE,550,h+60,220,130,hwnd,0,0,0);
+ hHelpLabel=CreateWindow("STATIC","Control:\r\nAxis 1 +/- : Q/A\r\nAxis 2 +/- : W/S\r\nAxis 3 +/- : E/D\r\nNumpad \"+\" - zoom in\r\nNumpad \"-\" - zoom out\r\nRight mouse button - rotate\r\nNumpad \"7\" - Top view\r\nNumpad \".\" - reset view",WS_CHILD|WS_VISIBLE,550,h+60,180,130,hwnd,0,0,0);
 
 // SendMessage(hPointVel,WM_SETTEXT,0,(LPARAM)lll);
 /*
@@ -262,8 +262,8 @@ printf("Codepage:%u\n",GetACP());
  hLinVel=CreateWindow("EDIT","100",WS_CHILD|WS_VISIBLE|WS_BORDER,375,h+100,55,25,hwnd,0,0,0);
 
  
- hCopyCircButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,430,h,20,25,hwnd,0,0,0);
- hCopyCircAuxButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,450,h,20,25,hwnd,0,0,0);
+ hCopyCircButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,450,h,20,25,hwnd,0,0,0);
+ hCopyCircAuxButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,430,h,20,25,hwnd,0,0,0);
  hArctoButton=CreateWindow("BUTTON","Arc to:",WS_CHILD|WS_VISIBLE,470,h,55,25,hwnd,0,0,0);
  hXCircEndLabel=CreateWindow("STATIC","end X:",WS_CHILD|WS_VISIBLE,430,h+25,45,25,hwnd,0,0,0);
  hYCircEndLabel=CreateWindow("STATIC","end Y:",WS_CHILD|WS_VISIBLE,430,h+50,45,25,hwnd,0,0,0);
@@ -308,24 +308,24 @@ printf("Codepage:%u\n",GetACP());
 
  hResetErrorButton=CreateWindow("BUTTON","Reset Error",WS_CHILD|WS_VISIBLE,550,h+35,90,25,hwnd,0,0,0);
 
- hBit15=CreateWindow("BUTTON","F",WS_CHILD|WS_VISIBLE,800,h+35,12,20,hwnd,0,0,0);
- hBit14=CreateWindow("BUTTON","E",WS_CHILD|WS_VISIBLE,812,h+35,12,20,hwnd,0,0,0);
- hBit13=CreateWindow("BUTTON","D",WS_CHILD|WS_VISIBLE,824,h+35,12,20,hwnd,0,0,0);
- hBit12=CreateWindow("BUTTON","C",WS_CHILD|WS_VISIBLE,836,h+35,12,20,hwnd,0,0,0);
- hBit11=CreateWindow("BUTTON","B",WS_CHILD|WS_VISIBLE,848,h+35,12,20,hwnd,0,0,0);
- hBit10=CreateWindow("BUTTON","A",WS_CHILD|WS_VISIBLE,860,h+35,12,20,hwnd,0,0,0);
- hBit09=CreateWindow("BUTTON","9",WS_CHILD|WS_VISIBLE,872,h+35,12,20,hwnd,0,0,0);
- hBit08=CreateWindow("BUTTON","8",WS_CHILD|WS_VISIBLE,884,h+35,12,20,hwnd,0,0,0);
- hBit07=CreateWindow("BUTTON","7",WS_CHILD|WS_VISIBLE,896,h+35,12,20,hwnd,0,0,0);
- hBit06=CreateWindow("BUTTON","6",WS_CHILD|WS_VISIBLE,908,h+35,12,20,hwnd,0,0,0);
- hBit05=CreateWindow("BUTTON","5",WS_CHILD|WS_VISIBLE,920,h+35,12,20,hwnd,0,0,0);
- hBit04=CreateWindow("BUTTON","4",WS_CHILD|WS_VISIBLE,932,h+35,12,20,hwnd,0,0,0);
- hBit03=CreateWindow("BUTTON","3",WS_CHILD|WS_VISIBLE,944,h+35,12,20,hwnd,0,0,0);
- hBit02=CreateWindow("BUTTON","2",WS_CHILD|WS_VISIBLE,956,h+35,12,20,hwnd,0,0,0);
- hBit01=CreateWindow("BUTTON","1",WS_CHILD|WS_VISIBLE,968,h+35,12,20,hwnd,0,0,0);
- hBit00=CreateWindow("BUTTON","0",WS_CHILD|WS_VISIBLE,980,h+35,12,20,hwnd,0,0,0);
- hSendTestWordInput=CreateWindow("EDIT","0000",WS_CHILD|WS_VISIBLE|WS_BORDER,850,h+55,50,25,hwnd,0,0,0);
- hSendTestWordButton=CreateWindow("BUTTON","Send",WS_CHILD|WS_VISIBLE|WS_BORDER,900,h+55,50,25,hwnd,0,0,0);
+ hBit15=CreateWindow("BUTTON","F",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,810,h+35,32,20,hwnd,0,0,0);
+ hBit14=CreateWindow("BUTTON","E",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,810,h+55,32,20,hwnd,0,0,0);
+ hBit13=CreateWindow("BUTTON","D",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,810,h+75,32,20,hwnd,0,0,0);
+ hBit12=CreateWindow("BUTTON","C",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,810,h+95,32,20,hwnd,0,0,0);
+ hBit11=CreateWindow("BUTTON","B",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,843,h+35,32,20,hwnd,0,0,0);
+ hBit10=CreateWindow("BUTTON","A",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,843,h+55,32,20,hwnd,0,0,0);
+ hBit09=CreateWindow("BUTTON","9",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,843,h+75,32,20,hwnd,0,0,0);
+ hBit08=CreateWindow("BUTTON","8",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,843,h+95,32,20,hwnd,0,0,0);
+ hBit07=CreateWindow("BUTTON","7",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,877,h+35,32,20,hwnd,0,0,0);
+ hBit06=CreateWindow("BUTTON","6",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,877,h+55,32,20,hwnd,0,0,0);
+ hBit05=CreateWindow("BUTTON","5",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,877,h+75,32,20,hwnd,0,0,0);
+ hBit04=CreateWindow("BUTTON","4",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,877,h+95,32,20,hwnd,0,0,0);
+ hBit03=CreateWindow("BUTTON","3",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,910,h+35,32,20,hwnd,0,0,0);
+ hBit02=CreateWindow("BUTTON","2",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,910,h+55,32,20,hwnd,0,0,0);
+ hBit01=CreateWindow("BUTTON","1",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,910,h+75,32,20,hwnd,0,0,0);
+ hBit00=CreateWindow("BUTTON","0",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,910,h+95,32,20,hwnd,0,0,0);
+ hSendTestWordInput=CreateWindow("EDIT","0000",WS_CHILD|WS_VISIBLE|WS_BORDER,810,h+115,50,25,hwnd,0,0,0);
+ hSendTestWordButton=CreateWindow("BUTTON","Send",WS_CHILD|WS_VISIBLE|WS_BORDER,860,h+115,50,25,hwnd,0,0,0);
 
  char lbuf[256];
  sprintf(lbuf,"%.1f",A1offset);
@@ -341,8 +341,8 @@ printf("Codepage:%u\n",GetACP());
  hButtonOpen = CreateWindowA("BUTTON","Open points' file",WS_CHILD|WS_VISIBLE,650,h,140,25,hwnd,0,0,0);
  hButtonRunTrajectory=CreateWindowA("BUTTON","Run",WS_CHILD|WS_VISIBLE,650,h+25,45,25,hwnd,0,0,0);
  hButtonResetTrajectory=CreateWindowA("BUTTON","Reset",WS_CHILD|WS_VISIBLE,695,h+25,50,25,hwnd,0,0,0);
- hRadioStepTrajectory=CreateWindowA("BUTTON","Step",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,800,h+100,60,25,hwnd,0,0,0);
- hRadioContTrajectory=CreateWindowA("BUTTON","Cont",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,800,h+125,60,25,hwnd,0,0,0);
+ hRadioStepTrajectory=CreateWindowA("BUTTON","Step",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,745,h+25,60,25,hwnd,0,0,0);
+ hRadioContTrajectory=CreateWindowA("BUTTON","Cont",WS_CHILD|WS_VISIBLE|BS_RADIOBUTTON,745,h+50,60,25,hwnd,0,0,0);
 
 
  EnableWindow(hButtonRunTrajectory,0);

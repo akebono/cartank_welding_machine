@@ -93,6 +93,15 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
       if(lParam==(LPARAM)hButtonErase){
         curpt=0;
       }
+      if(lParam==(LPARAM)hButtonDraw){
+       if(show_trajectory){
+        SendMessage(hButtonDraw,BM_SETCHECK,BST_UNCHECKED,0);
+        show_trajectory=0;
+       }else{
+        SendMessage(hButtonDraw,BM_SETCHECK,BST_CHECKED,0);
+        show_trajectory=1;
+       }
+      }
       if(lParam==(LPARAM)hLinetoButton){
        float lx,ly,lc,lvel;
 
@@ -132,19 +141,15 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
 //       task=1;
 
-       EnableWindow(hButtonResetTrajectory,0);
-       EnableWindow(hButtonRunTrajectory,0);
-
-       char lbuf[36];
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&lx,4);
        memcpy(lbuf+8,&ly,4);
        memcpy(lbuf+12,&lc,4);
        memcpy(lbuf+16,&lvel,4);
-       memcpy(lbuf+32,&sernumstart,4);
+       memcpy(lbuf+32,&sernumback,4);
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
-       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 
@@ -213,11 +218,8 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        a3e=cd-cphi+Axis3;
 //Axis3=a3e;
 //       inCirc=1;
-       EnableWindow(hButtonResetTrajectory,0);
-       EnableWindow(hButtonRunTrajectory,0);
 
-
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=2;
        memcpy(lbuf+4,&xe,4);
        memcpy(lbuf+8,&ye,4);
@@ -226,15 +228,15 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        memcpy(lbuf+20,&xa,4);
        memcpy(lbuf+24,&ya,4);
        memcpy(lbuf+28,&ca,4);
-       memcpy(lbuf+32,&sernumstart,4);
-       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+       memcpy(lbuf+32,&sernumback,4);
+       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 
       if(lParam==(LPARAM)hResetErrorButton){
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=4;
-       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
          printf("send failed\n");
       }
 
@@ -395,19 +397,19 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
          SetWindowText(hButtonRunTrajectory,"Cont.");
          EnableWindow(hRadioStepTrajectory,1);
          EnableWindow(hButtonOpen,1);
-         memset(lbuf,0,36);
+         memset(lbuf,0,40);
          lbuf[0]=8;
-         sernumsent=sernumstart+currentPoint;
-         memcpy(lbuf+32,&sernumsent,4);
-         if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+//         sernumsent=sernumstart+currentPoint;
+         memcpy(lbuf+32,&sernumback,4);
+         if(sendto(s,lbuf,40,0,&rsa,16)==-1)
           printf("send failed\n");
         }else{
          if(currentPoint>-1){
-          memset(lbuf,0,36);
+          memset(lbuf,0,40);
           lbuf[0]=16;
           sernumsent=sernumstart+currentPoint;
           memcpy(lbuf+32,&sernumsent,4);
-          if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+          if(sendto(s,lbuf,40,0,&rsa,16)==-1)
            printf("send failed\n");
           SetWindowText(hButtonRunTrajectory,"Pause");
           doTrajectory=1;
@@ -458,9 +460,9 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        EnableWindow(hButtonRunTrajectory,1);
        EnableWindow(hButtonResetTrajectory,0);
        EnableWindow(hRadioStepTrajectory,1);
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=32;
-       if(sendto(s,lbuf,36,0,&rsa,16)==-1)
+       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
         printf("send failed\n");
       }
 
@@ -470,8 +472,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       unsigned char lbuf[36];
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
@@ -486,8 +487,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        float newx=x-atof(lbuf);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
-       char lbuf[36];
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&newx,4);
        memcpy(lbuf+8,&y,4);
@@ -503,8 +503,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       char lbuf[36];
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&newy,4);
@@ -521,8 +520,8 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       char lbuf[36];
-       memset(lbuf,0,36);
+
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&newy,4);
@@ -538,8 +537,8 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       char lbuf[36];
-       memset(lbuf,0,36);
+
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&y,4);
@@ -555,8 +554,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        GetWindowText(hIncVelValue,lbuf,255);
        float vel=atof(lbuf);
 
-       char lbuf[36];
-       memset(lbuf,0,36);
+       memset(lbuf,0,40);
        lbuf[0]=1;
        memcpy(lbuf+4,&x,4);
        memcpy(lbuf+8,&y,4);

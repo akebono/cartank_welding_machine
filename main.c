@@ -23,6 +23,7 @@ HWND hTest;
 HWND hButtonOpen;
 HWND hButtonStartServer,hStatus;
 HWND hButtonErase;
+HWND hButtonDraw;
 HWND hButtonRunTrajectory;
 HWND hButtonResetTrajectory;
 HWND hRadioStepTrajectory;
@@ -248,7 +249,8 @@ printf("Codepage:%u\n",GetACP());
 */
 
 
- hButtonErase=CreateWindow("BUTTON","Erase",WS_CHILD|WS_VISIBLE,550,h,50,25,hwnd,0,0,0);
+ hButtonErase=CreateWindow("BUTTON","Erase",WS_CHILD|WS_VISIBLE,540,h,50,25,hwnd,0,0,0);
+ hButtonDraw=CreateWindow("BUTTON","show",WS_CHILD|WS_VISIBLE|BS_CHECKBOX,590,h,60,25,hwnd,0,0,0);
 
  hCopyLinButton=CreateWindow("BUTTON",">",WS_CHILD|WS_VISIBLE,340,h,20,25,hwnd,0,0,0);
  hLinetoButton=CreateWindow("BUTTON","Move to:",WS_CHILD|WS_VISIBLE,360,h,70,25,hwnd,0,0,0);

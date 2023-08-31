@@ -44,6 +44,7 @@ float xe,ye,ce,a3e,a3a;
 float traj[POINTS][3];
 float trajc[POINTS][3];
 int curpt=0;
+char show_trajectory=0;
 
 struct point{
  char *name;
@@ -214,8 +215,8 @@ void draw(){
     EnableWindow(hButtonOpen,1);
    }else{
     if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
-     char lbuf[36];
-     memset(lbuf,0,36);
+     char lbuf[40];
+     memset(lbuf,0,40);
      memcpy(lbuf,&trajectory[currentPoint].type,4);
      memcpy(lbuf+4,&trajectory[currentPoint].x,4);
      memcpy(lbuf+8,&trajectory[currentPoint].y,4);
@@ -303,19 +304,20 @@ trajc[curpt][1]=yc;
 
 
   glPushMatrix();
-  glTranslatef(-tx+80*trans[0]*zoom,-ty-80*trans[1]*zoom,tz);
   glRotatef(rot[1]/1.0,1,0,0);
   glRotatef(rot[0]/1.0,0,1,0);
+//  glTranslatef(-tx+80*zoom*(trans[0]*cos(rot[0]*3.141592654/180)+trans[1]*sin(rot[1]*3.141592654/180)),-ty-80*zoom*(trans[1]*cos(rot[0]*3.141592654/180)+trans[0]*sin(rot[1]*3.141592654/180)),tz);
+  glTranslatef(-tx+80*zoom*trans[0],-ty-80*zoom*trans[1],tz);
   glDisable(GL_LIGHTING);
-
-  glColor3f(1,1,0);
-  glBegin(GL_LINES);
-  for(int i=1;i<curpt;i++){
-   glVertex3f(trajc[i-1][0],trajc[i-1][1],1300);
-   glVertex3f(trajc[i][0],trajc[i][1],1300);
+  if(show_trajectory){
+   glColor3f(1,1,0);
+   glBegin(GL_LINES);
+   for(int i=1;i<curpt;i++){
+    glVertex3f(trajc[i-1][0],trajc[i-1][1],1300);
+    glVertex3f(trajc[i][0],trajc[i][1],1300);
+   }
+   glEnd();
   }
-  glEnd();
-
 
 
 

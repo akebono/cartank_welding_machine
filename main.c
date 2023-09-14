@@ -63,6 +63,7 @@ int ralen=16;
 void sendPacket(unsigned char*);
 
 #include "draw.c"
+#include "draw2.c"
 PIXELFORMATDESCRIPTOR pfd = { 0x28,   // size of this pfd
 	1,                     // version number
 	PFD_DRAW_TO_WINDOW |   // support window
@@ -172,7 +173,7 @@ void sendPacket(unsigned char *lbuf){
 }
 
 //int APIENTRY wWinMain(HINSTANCE h1,HINSTANCE h2,LPWSTR fr,int bh){
-  int main(){
+int main(){
   MSG msg;
   char buf[256];
   WNDCLASSEXA wcex;

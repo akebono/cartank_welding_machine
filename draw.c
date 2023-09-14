@@ -36,7 +36,7 @@ unsigned short sernumstart=500;
 unsigned short sernumsent=-1;
 unsigned short sernumback=0;
 unsigned short sernumwindow=0;
-
+char runmode=0; //0-cont, 1-step
 unsigned short testword=0;
 
 double dx=0,dy=0,d3=0;
@@ -108,20 +108,6 @@ void doCalc(){
   c=Axis1+Axis2+Axis3;
 }
 
-void doCalc2(){
- Axis1=180-acos((A1lever*A1lever+A1offset*A1offset-L1*L1)/(2*A1lever*A1offset))*180/pi;
-
- A1motor=asin(A1lever*sin((180-Axis1)*pi/180)/L1)*180/pi; //направление штанги первой оси
-
- Axis2=90-acos((A2lever*A2lever+A2offset*A2offset-L2*L2)/(2*A2lever*A2offset))*180/pi-Axis1;
- A2motor=asin(A2lever*sin((90-Axis2-Axis1)*pi/180)/L2)*180/pi; //направление штанги второй оси
-
- float g=sqrt(toolpos[0]*toolpos[0]+toolpos[1]*toolpos[1]);
- float psi=atan(toolpos[1]/toolpos[0]);
- x=g*cos((Axis1+Axis2+Axis3)*pi/180+psi)-Arm1*cos((Axis3+Axis2)*pi/180)-Arm2*cos(Axis3*pi/180);
- y=g*sin((Axis1+Axis2+Axis3)*pi/180+psi)+Arm1*sin((Axis3+Axis2)*pi/180)+Arm2*sin(Axis3*pi/180);
-
-}
 
 void doInverse(){
  float ly=y;
@@ -179,7 +165,6 @@ void draw(){
   if(Axis2<-145)
    Axis2=-145;
 */
-
   Axis3+=dA3*0.15;
   if(task){
    t0+=delta;
@@ -214,23 +199,26 @@ void draw(){
     EnableWindow(hRadioStepTrajectory,1);
     EnableWindow(hButtonOpen,1);
    }else{
-    if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
-     char lbuf[40];
-     memset(lbuf,0,40);
-     memcpy(lbuf,&trajectory[currentPoint].type,4);
-     memcpy(lbuf+4,&trajectory[currentPoint].x,4);
-     memcpy(lbuf+8,&trajectory[currentPoint].y,4);
-     memcpy(lbuf+12,&trajectory[currentPoint].c,4);
-     memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
-     memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
-     memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
-     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
-     sernumsent=sernumstart+currentPoint;
-     memcpy(lbuf+32,&sernumsent,2);
-     sendPacket(lbuf);
-     printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
-     currentPoint++;
+    if(runmode==0){
+     if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
+      char lbuf[40];
+      memset(lbuf,0,40);
+      memcpy(lbuf,&trajectory[currentPoint].type,4);
+      memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+      memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+      memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+      memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+      memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+      memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+      memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+      sernumsent=sernumstart+currentPoint;
+      memcpy(lbuf+32,&sernumsent,2);
+      sendPacket(lbuf);
+      printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+      currentPoint++;
+     }
     }
+
    }
   }
 
@@ -297,11 +285,10 @@ void draw(){
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 */
-traj[curpt][0]=x;
-traj[curpt][1]=y;
-trajc[curpt][0]=xc;
-trajc[curpt][1]=yc;
-
+ traj[curpt][0]=x;
+ traj[curpt][1]=y;
+ trajc[curpt][0]=xc;
+ trajc[curpt][1]=yc;
 
   glPushMatrix();
   glRotatef(rot[1]/1.0,1,0,0);
@@ -631,6 +618,7 @@ trajc[curpt][1]=yc;
     glVertex3f(*(float*)(blobs[j]+40+i*50),*(float*)(blobs[j]+44+i*50),*(float*)(blobs[j]+48+i*50));
   }
   glEnd();
+
   glPushMatrix();
   glTranslatef(Arm1,0,0);
   glRotatef(Axis2,0,0,1);
@@ -649,9 +637,8 @@ trajc[curpt][1]=yc;
     glVertex3f(*(float*)(blobs[j]+40+i*50),*(float*)(blobs[j]+44+i*50),*(float*)(blobs[j]+48+i*50));
   }
   glEnd();
+
   glPushMatrix();
-
-
   glTranslatef(Arm2,0,300);
   glRotatef(Axis3,0,0,1);
 glDisable(GL_LIGHTING);

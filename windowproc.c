@@ -149,8 +149,7 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
        memcpy(lbuf+16,&lvel,4);
        memcpy(lbuf+32,&sernumback,4);
        printf("%u.%u.%u.%u\n",(unsigned char)rsa.sa_data[2],(unsigned char)rsa.sa_data[3],(unsigned char)rsa.sa_data[4],(unsigned char)rsa.sa_data[5]);
-       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-         printf("send failed\n");
+       sendPacket(lbuf);
       }
 
       if(lParam==(LPARAM)hArctoButton){
@@ -229,15 +228,13 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        memcpy(lbuf+24,&ya,4);
        memcpy(lbuf+28,&ca,4);
        memcpy(lbuf+32,&sernumback,4);
-       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-         printf("send failed\n");
+       sendPacket(lbuf);
       }
 
       if(lParam==(LPARAM)hResetErrorButton){
        memset(lbuf,0,40);
        lbuf[0]=4;
-       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-         printf("send failed\n");
+       sendPacket(lbuf);
       }
 
       if(lParam==(LPARAM)hButtonOpen){
@@ -344,10 +341,9 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
           EnableWindow(hButtonRunTrajectory,1);
           EnableWindow(hButtonResetTrajectory,0);
           EnableWindow(hRadioStepTrajectory,1);
-          memset(lbuf,0,36);
+          memset(lbuf,0,40);
           lbuf[0]=32;
-          if(sendto(s,lbuf,36,0,&rsa,16)==-1)
-           printf("send failed\n");
+          sendPacket(lbuf);
           SendMessage(hTest,WM_PAINT,0,0);
           if(pnum>0){
            EnableWindow(hButtonRunTrajectory,1);
@@ -391,7 +387,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
         }
       }
       if(lParam==(LPARAM)hButtonRunTrajectory){
-printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
+       if(runmode==0){
         if(doTrajectory==1){
          doTrajectory=0;
          SetWindowText(hButtonRunTrajectory,"Cont.");
@@ -401,16 +397,14 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
          lbuf[0]=8;
 //         sernumsent=sernumstart+currentPoint;
          memcpy(lbuf+32,&sernumback,4);
-         if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-          printf("send failed\n");
+         sendPacket(lbuf);
         }else{
          if(currentPoint>-1){
           memset(lbuf,0,40);
           lbuf[0]=16;
           sernumsent=sernumstart+currentPoint;
           memcpy(lbuf+32,&sernumsent,4);
-          if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-           printf("send failed\n");
+          sendPacket(lbuf);
           SetWindowText(hButtonRunTrajectory,"Pause");
           doTrajectory=1;
           EnableWindow(hRadioStepTrajectory,0);
@@ -426,7 +420,36 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
           EnableWindow(hButtonOpen,0);
          }
         }
-        printf("after. doTrajectory=%i currentPoint=%i sernumback=%i sernumsent=%i\n",doTrajectory,currentPoint,sernumback,sernumsent);
+       }
+       if(runmode==1){
+         
+        if(currentPoint==-1){
+         currentPoint=0;
+         sernumstart=sernumback;
+        }
+
+        memset(lbuf,0,40);
+        lbuf[0]=16;
+        memcpy(lbuf+32,&sernumback,4);
+        sendPacket(lbuf);
+
+        memset(lbuf,0,40);
+        memcpy(lbuf,&trajectory[currentPoint].type,4);
+        memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+        memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+        memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+        memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+        memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+        memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+        memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+        sernumsent=sernumstart+currentPoint;
+        memcpy(lbuf+32,&sernumsent,2);
+        sendPacket(lbuf);
+        printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+        currentPoint++;
+        if(currentPoint==trajectoryLength)
+         currentPoint=0;
+       }
       }
 
       if(lParam==(LPARAM)hRadioStepTrajectory){
@@ -447,8 +470,31 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
        currentPoint++;
 */
+       runmode=1;
        SendMessage(hRadioStepTrajectory,BM_SETCHECK,BST_CHECKED,0);
        SendMessage(hRadioContTrajectory,BM_SETCHECK,BST_UNCHECKED,0);
+      }
+      if(lParam==(LPARAM)hRadioContTrajectory){
+/*
+       char lbuf[36];
+       memset(lbuf,0,36);
+       memcpy(lbuf,&trajectory[currentPoint].type,4);
+       memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+       memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+       memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+       memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+       memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+       memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+       memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+       sernumsent=sernumstart+currentPoint;
+       memcpy(lbuf+32,&sernumsent,2);
+       sendPacket(lbuf);
+       printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+       currentPoint++;
+*/
+       runmode=0;
+       SendMessage(hRadioStepTrajectory,BM_SETCHECK,BST_UNCHECKED,0);
+       SendMessage(hRadioContTrajectory,BM_SETCHECK,BST_CHECKED,0);
       }
 
       if(lParam==(LPARAM)hButtonResetTrajectory){
@@ -462,8 +508,7 @@ printf("before. doTrajectory=%i currentPoint=%i\n",doTrajectory,currentPoint);
        EnableWindow(hRadioStepTrajectory,1);
        memset(lbuf,0,40);
        lbuf[0]=32;
-       if(sendto(s,lbuf,40,0,&rsa,16)==-1)
-        printf("send failed\n");
+       sendPacket(lbuf);
       }
 
       if(lParam==(LPARAM)hXPlusButton){
@@ -781,7 +826,7 @@ LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
      else
       glClearColor(0,0,0,1);
      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-     draw();
+     draw2();
      glFinish();
      SwapBuffers(hDC);
    break;
@@ -842,6 +887,11 @@ LRESULT CALLBACK WinProcOpenGL(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
     case 0x67: //top view
      rot[0]=0;
      rot[1]=0;
+     trans[0]=0;
+     trans[1]=0;
+     tx=0;
+     ty=0;
+     tz=0;
     break;
     default:
 printf("%llX\n",wParam);

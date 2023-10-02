@@ -7,33 +7,34 @@ void doCalc2(){
  Axis2=90-acos((A2lever*A2lever+A2offset*A2offset-L2*L2)/(2*A2lever*A2offset))*180/pi-Axis1;
  A2motor=asin(A2lever*sin((90-Axis2-Axis1)*pi/180)/L2)*180/pi; //направление штанги второй оси
 
- float g=sqrt(toolpos[0]*toolpos[0]+toolpos[1]*toolpos[1]);
- float psi=atan(toolpos[1]/toolpos[0]);
 
- x=g*cos((Axis1+Axis2+Axis3)*pi/180+psi)-Arm1*cos((Axis3+Axis2)*pi/180)-Arm2*cos(Axis3*pi/180);
  x=-g*cos((Axis1+Axis2+Axis3)*pi/180-pi-psi)-Arm1*cos((Axis3+Axis2)*pi/180)-Arm2*cos(Axis3*pi/180);
  xc=x;
- y=g*sin((Axis1+Axis2+Axis3)*pi/180+psi)+Arm1*sin((Axis3+Axis2)*pi/180)+Arm2*sin(Axis3*pi/180);
  y=g*sin((Axis1+Axis2+Axis3)*pi/180-pi-psi)+Arm1*sin((Axis3+Axis2)*pi/180)+Arm2*sin(Axis3*pi/180);
  yc=y;
+ c=Axis1+Axis2+Axis3;
 }
 
 void doInverse2(){
- float g=sqrt(toolpos[0]*toolpos[0]+toolpos[1]*toolpos[1]);
- float psi=atan(toolpos[1]/toolpos[0]);
  float lr2=x*x+y*y;
- float lAxis2=acos((-lr2+Arm1*Arm1+Arm2*Arm2)/(2*Arm1*Arm2));
- float lAxis3=atan(y/x)-lAxis2;
- float lAxis1=0;
+// curpt++;
+ float lAxis3=c;
+ float theta=pi/2-c;
+ float e2=Arm2*Arm2+lr2-sqrt(lr2)*Arm2*cos(theta);
+ float lAxis1=psi+acos((Arm1*Arm1+g*g-e2)/(2*Arm1*g));
+ float lAxis2=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)))+acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
 
  lAxis2*=180/pi;
  lAxis3*=180/pi;
+ lAxis1*=180/pi;
+
+ printf("inverse: %.1f %.1f %.1f\n",lAxis1,lAxis2,lAxis3);
 
  Axis3=lAxis3;
  Axis2=lAxis2;
+
  L1=sqrt(A1offset*A1offset+A1lever*A1lever-2*A1offset*A1lever*cos((180-lAxis1)*pi/180));
  L2=sqrt(A2offset*A2offset+A2lever*A2lever-2*A2offset*A2lever*cos((90-lAxis2-lAxis1)*pi/180));
-// curpt++;
 }
 
 
@@ -44,6 +45,53 @@ void draw2(){
  Axis3+=dA3*0.15;
 
  doCalc2();
+
+  zoom*=zoom_d;
+  tx+=tx_d*2000*sqrt(zoom);
+  ty+=ty_d*2000*sqrt(zoom);
+
+ if(((status&7==1) ||(status&0x38==8)) && !doTrajectory){//for when "Arc To" or "Lin To" done
+  EnableWindow(hButtonResetTrajectory,1);
+  EnableWindow(hButtonRunTrajectory,1);
+ }
+
+ if(!trajectoryDone){
+  if(sernumback-sernumstart+1==trajectoryLength){
+   SetWindowText(hButtonRunTrajectory,"Run");
+   sernumstart=sernumback;
+   EnableWindow(hButtonRunTrajectory,1);
+   trajectoryDone=1;
+  }
+ }
+ if(doTrajectory){
+  if(currentPoint==trajectoryLength){
+   doTrajectory=0;
+   currentPoint=-1;
+   SetWindowText(hButtonRunTrajectory,"Run");
+   EnableWindow(hRadioStepTrajectory,1);
+   EnableWindow(hButtonOpen,1);
+  }else{
+   if(runmode==0){
+    if(((sernumback<=(sernumstart+currentPoint)) && (sernumback>=(sernumstart+currentPoint)-2))&& (!(status&36) || status&9)){
+     char lbuf[40];
+     memset(lbuf,0,40);
+     memcpy(lbuf,&trajectory[currentPoint].type,4);
+     memcpy(lbuf+4,&trajectory[currentPoint].x,4);
+     memcpy(lbuf+8,&trajectory[currentPoint].y,4);
+     memcpy(lbuf+12,&trajectory[currentPoint].c,4);
+     memcpy(lbuf+16,&trajectory[currentPoint].vel,4);
+     memcpy(lbuf+20,&trajectory[currentPoint].xa,4);
+     memcpy(lbuf+24,&trajectory[currentPoint].ya,4);
+     memcpy(lbuf+28,&trajectory[currentPoint].ca,4);
+     sernumsent=sernumstart+currentPoint;
+     memcpy(lbuf+32,&sernumsent,2);
+     sendPacket(lbuf);
+     printf("current point:%i(%i) %s\n",currentPoint,trajectoryLength,trajectory[currentPoint].name);
+     currentPoint++;
+    }
+   }
+  }
+ }
 
  glMatrixMode(GL_PROJECTION);
  glLoadIdentity();
@@ -72,8 +120,11 @@ void draw2(){
   SetWindowText(hYactual,lbuf);
   oldy=y;
  }
- sprintf(lbuf,"%i",curpt);
- SetWindowText(hZactual,lbuf);
+  if(oldc!=c){
+   sprintf(lbuf,"C: %.2f deg",c);
+   SetWindowText(hZactual,lbuf);
+   oldc=c;
+  }
 
   if(oldAxis1!=Axis1 || oldL1!=L1){
    sprintf(lbuf,"%.1f / %.3f",Axis1,L1);
@@ -106,17 +157,24 @@ void draw2(){
  glRotatef(rot[0]/1.0,0,1,0);
  glTranslatef(-tx+trans[0],-ty-trans[1],tz);
 
-//glRotatef(Axis1+Axis2+Axis3,0,0,1);
+ glTranslatef(g,0,0);
+ glRotatef(Axis1,0,0,1);
+ glTranslatef(Arm1,0,0);
+ glRotatef(Axis2,0,0,1);
+ glTranslatef(Arm2,0,0);
+ glRotatef(Axis3,0,0,1);
 
- glDisable(GL_LIGHTING);
- glColor3f(1,1,0);
- glBegin(GL_LINES);
- for(int i=1;i<curpt;i++){
-  glVertex3f(trajc[i-1][0],trajc[i-1][1],1300);
-  glVertex3f(trajc[i][0],trajc[i][1],1300);
+
+ if(show_trajectory){
+  glDisable(GL_LIGHTING);
+  glColor3f(1,1,0);
+  glBegin(GL_LINES);
+  for(int i=1;i<curpt;i++){
+   glVertex3f(trajc[i-1][0],trajc[i-1][1],1300);
+   glVertex3f(trajc[i][0],trajc[i][1],1300);
+  }
+  glEnd();
  }
- glEnd();
-
 
 
  glColor3f(1,1,1);

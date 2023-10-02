@@ -25,6 +25,8 @@ float delta=0.01;
 char task=0;
 float pi=3.141592654;
 float angle=0;
+float g;
+float psi;
 
 float Axis1=90,Axis2=-90,Axis3=0;
 float dL1=0,dL2=0,dA3=0;
@@ -743,4 +745,6 @@ printf("%i %i %i %i\n",viewport[0],viewport[1],viewport[2],viewport[3]);
   load_model("motor1.stl");
   load_model("gofra1A.stl");
   load_model("gofra1B.stl");
+  g=sqrt(toolpos[0]*toolpos[0]+toolpos[1]*toolpos[1]);
+  psi=atan(toolpos[1]/toolpos[0]);
 }

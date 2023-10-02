@@ -123,6 +123,8 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
 
        xe=lx;
        ye=ly;
+x=xe;y=ye;
+       doInverse2();
 
        float lAxis1=atan(ye/xe)+acos((Arm1*Arm1+xe*xe+ye*ye-Arm2*Arm2)/(2*Arm1*sqrt(xe*xe+ye*ye)));
        lAxis1*=180/pi;
@@ -509,6 +511,7 @@ printf("x0=%.3f y0=%.3f r=%.3f (%.2f)\n",cx,cy,cr,cd-cphi);
        memset(lbuf,0,40);
        lbuf[0]=32;
        sendPacket(lbuf);
+
       }
 
       if(lParam==(LPARAM)hXPlusButton){

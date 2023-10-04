@@ -16,13 +16,14 @@ void doCalc2(){
 }
 
 void doInverse2(){
+ float lAxis1,lAxis2,lAxis3;
  float lr2=x*x+y*y;
-// curpt++;
- float lAxis3=c;
- float theta=pi/2-c;
+ curpt++;
+ lAxis3=(c-Axis2-Axis1)*pi/180;
+ float theta=pi/2-lAxis3;
  float e2=Arm2*Arm2+lr2-sqrt(lr2)*Arm2*cos(theta);
- float lAxis1=psi+acos((Arm1*Arm1+g*g-e2)/(2*Arm1*g));
- float lAxis2=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)))+acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
+ lAxis1=psi+acos((Arm1*Arm1+g*g-e2)/(2*Arm1*g));
+ lAxis2=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)))+acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
 
  lAxis2*=180/pi;
  lAxis3*=180/pi;
@@ -32,7 +33,7 @@ void doInverse2(){
 
  Axis3=lAxis3;
  Axis2=lAxis2;
-
+ Axis1=lAxis1;
  L1=sqrt(A1offset*A1offset+A1lever*A1lever-2*A1offset*A1lever*cos((180-lAxis1)*pi/180));
  L2=sqrt(A2offset*A2offset+A2lever*A2lever-2*A2offset*A2lever*cos((90-lAxis2-lAxis1)*pi/180));
 }

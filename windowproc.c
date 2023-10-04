@@ -124,6 +124,7 @@ LRESULT CALLBACK WinProc2(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam){
        xe=lx;
        ye=ly;
 x=xe;y=ye;
+c=lc;
        doInverse2();
 
        float lAxis1=atan(ye/xe)+acos((Arm1*Arm1+xe*xe+ye*ye-Arm2*Arm2)/(2*Arm1*sqrt(xe*xe+ye*ye)));

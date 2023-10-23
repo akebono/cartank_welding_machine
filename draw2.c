@@ -21,11 +21,16 @@ void doInverse2(){
  curpt++;
  lAxis3=(c-Axis2-Axis1)*pi/180;
 // float theta=pi/2-lAxis3;
- float theta=atan(y/x)+с;//lAxis3;
+ float theta=atan(y/x)+c;//lAxis3;
 
  float e2=Arm2*Arm2+lr2-sqrt(lr2)*Arm2*cos(theta);
  lAxis1=psi+acos((Arm1*Arm1+g*g-e2)/(2*Arm1*g));
- lAxis2=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)))+acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
+ float part1=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)));
+ float part2=acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
+ if(theta<0)
+  lAxis2=part1-part2-pi;
+ else
+  lAxis2=part1+part2-pi;
 
  lAxis2*=180/pi;
  lAxis3*=180/pi;

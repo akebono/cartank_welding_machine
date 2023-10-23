@@ -21,16 +21,65 @@ void doInverse2(){
  curpt++;
  lAxis3=(c-Axis2-Axis1)*pi/180;
 // float theta=pi/2-lAxis3;
- float theta=atan(y/x)+c;//lAxis3;
+ float theta=c;
+ if(x<0 && y<0)
+  theta+=atan(y/x);
+ if(x>=0 && y<0)
+  theta+=pi+atan(y/x);
+ if(x>=0 && y>=0)
+  theta+=pi-atan(y/x);
+ if(x<0 && y>=0)
+  theta-=atan(y/x);
 
- float e2=Arm2*Arm2+lr2-sqrt(lr2)*Arm2*cos(theta);
+ if(x==0)
+  theta=pi/2+c;
+
+ float e2=Arm2*Arm2+lr2-2*sqrt(lr2)*Arm2*cos(theta);
  lAxis1=psi+acos((Arm1*Arm1+g*g-e2)/(2*Arm1*g));
  float part1=acos((Arm1*Arm1+e2-g*g)/(2*Arm1*sqrt(e2)));
  float part2=acos((Arm2*Arm2+e2-lr2)/(2*Arm2*sqrt(e2)));
- if(theta<0)
+ if(y>0)
   lAxis2=part1-part2-pi;
  else
   lAxis2=part1+part2-pi;
+printf("atan=%.1f theta=%.1f e=%.1f\n",atan(y/x)*180/pi,cos(theta),sqrt(e2));
+ lAxis2*=180/pi;
+ lAxis3*=180/pi;
+ lAxis1*=180/pi;
+
+ printf("inverse: %.1f %.1f %.1f\n",lAxis1,lAxis2,lAxis3);
+
+ Axis3=lAxis3;
+ Axis2=lAxis2;
+ Axis1=lAxis1;
+ L1=sqrt(A1offset*A1offset+A1lever*A1lever-2*A1offset*A1lever*cos((180-lAxis1)*pi/180));
+ L2=sqrt(A2offset*A2offset+A2lever*A2lever-2*A2offset*A2lever*cos((90-lAxis2-lAxis1)*pi/180));
+}
+
+void doInverse3(){
+ float lAxis1,lAxis2,lAxis3;
+ float lr2=x*x+y*y;
+ curpt++;
+ lAxis3=(c-Axis2-Axis1)*pi/180;
+
+ float gamma=c;
+ if(x>=0 && y>=0){
+  gamma+=pi/2-atan(y/x)-psi;
+ }
+ if(x>=0 && y<0){
+  gamma+=pi/2+atan(x/y)+psi;
+ }
+ if(x<0 && y>=0)
+  gamma+=pi/2-atan(y/x)-psi;
+ if(x<0 && y<0)
+  gamma=pi-psi+atan(y/x);
+
+ if(x==0)
+  gamma+=pi/2;
+
+ float f2=Arm2*Arm2+lr2-2*sqrt(lr2)*Arm2*cos(gamma);
+ lAxis2=acos((Arm1*Arm1+Arm2*Arm2-f2)/(2*Arm1*Arm2));
+ lAxis1=
 
  lAxis2*=180/pi;
  lAxis3*=180/pi;

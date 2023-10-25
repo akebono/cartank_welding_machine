@@ -77,9 +77,13 @@ void doInverse3(){
  if(x==0)
   gamma+=pi/2;
 
- float f2=Arm2*Arm2+lr2-2*sqrt(lr2)*Arm2*cos(gamma);
+ float f2=g*g+lr2-2*sqrt(lr2)*Arm2*cos(gamma);
  lAxis2=acos((Arm1*Arm1+Arm2*Arm2-f2)/(2*Arm1*Arm2));
- lAxis1=
+ float ga1=acos((g*g+f2-sqrt(lr2))/(2*g*sqrt(f2)));
+ float ga1a=acos((Arm1*Arm1+f2-Arm1*Arm1)/(2*Arm1*sqrt(f2)));
+
+ //todo variants
+ lAxis1=ga1a-ga1+psi;
 
  lAxis2*=180/pi;
  lAxis3*=180/pi;

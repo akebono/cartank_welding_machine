@@ -82,9 +82,25 @@ void doInverse3(){
  float ga1=acos((g*g+f2-sqrt(lr2))/(2*g*sqrt(f2)));
  float ga1a=acos((Arm1*Arm1+f2-Arm1*Arm1)/(2*Arm1*sqrt(f2)));
 
- //todo variants
- lAxis1=ga1a-ga1+psi;
-
+ //todo перевытянутость
+ if(gamma<lAxis2){
+ if(x>0 && y>0){
+  if(atan(y/x)>=psi)
+   lAxis1=psi+ga1+ga1a;
+  else
+   lAxis1=ga1a-ga1+psi;
+ }
+ if(x<0 && y<0){
+  if(atan(y/x)>=psi)
+   lAxis1=psi+ga1+ga1a;
+  else
+   lAxis1=psi-ga1+ga1a;
+ }
+ if(x>0 && y<0)
+  lAxis1=psi+ga1+ga1a;
+ if(x<0 && y>0)
+  lAxis1=psi-ga1+ga1a;
+ }
  lAxis2*=180/pi;
  lAxis3*=180/pi;
  lAxis1*=180/pi;

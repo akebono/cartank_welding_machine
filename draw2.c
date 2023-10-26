@@ -64,7 +64,7 @@ void doInverse3(){
 
  float gamma=c;
  if(x>=0 && y>=0){
-  gamma+=pi-psi+atan(y/x);
+  gamma+=pi-psi+atan(y/x)-psi;
  }
  if(x>=0 && y<0){
   gamma+=pi/2+atan(x/y)+psi;
@@ -82,28 +82,28 @@ void doInverse3(){
 
  lAxis2=acos((Arm1*Arm1+Arm2*Arm2-f2)/(2*Arm1*Arm2));
  lAxis2=lAxis2-pi;
- float ga1=acos((g*g+f2-lr2)/(2*g*sqrt(f2)));
- float ga1a=acos((Arm1*Arm1+f2-Arm2*Arm2)/(2*Arm1*sqrt(f2)));
-printf("ga1=%.1f ga1a=%.1f\n",ga1,ga1a);
+ float part1=acos((g*g+f2-lr2)/(2*g*sqrt(f2)));
+ float part2=acos((Arm1*Arm1+f2-Arm2*Arm2)/(2*Arm1*sqrt(f2)));
+printf("ga1=%.1f ga1a=%.1f\n",part1,part2);
  //todo перевытянутость
 // if(gamma<lAxis2){
 
   if(x>0 && y>=0){
    if(atan(y/x)>=psi)
-    lAxis1=psi+ga1+ga1a;
+    lAxis1=psi+part1+part2;
    else
-    lAxis1=psi-ga1+ga1a;
+    lAxis1=psi-part1+part2;
   }
   if(x<0 && y<0){
    if(atan(y/x)>=psi)
-    lAxis1=psi+ga1+ga1a;
+    lAxis1=psi+part1+part2;
    else
-    lAxis1=psi-ga1+ga1a;
+    lAxis1=psi-part1+part2;
   }
   if(x>0 && y<0)
-   lAxis1=psi+ga1+ga1a;
+   lAxis1=psi+part1+part2;
   if(x<0 && y>=0)
-   lAxis1=psi-ga1+ga1a;
+   lAxis1=psi-part1+part2;
 /*
  }else{
 printf("B\n");
